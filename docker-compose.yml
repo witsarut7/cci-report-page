@@ -1,15 +1,22 @@
-version: '3.8'
+version: "3.8"
+
+networks:
+  ccireportpage_network:
+
 services:
   app:
-    image: cci-report-page
+    image: itdevcci/cci-report-page
+    container_name: cci-report-page
     build:
       context: ./
       dockerfile: Dockerfile
     volumes:
-        - .:/app
-        - /app/node_modules
-        - /app/.next
+      - .:/app
+      - /app/node_modules
+      - /app/.next
     ports:
-      - "3000:3000"
+      - "4004:3000"
     env_file:
       - .env
+    networks:
+      - ccireportpage_network
