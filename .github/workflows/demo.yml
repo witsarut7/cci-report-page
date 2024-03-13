@@ -29,9 +29,9 @@ jobs:
 
           script: |
             cd ${{ secrets.PROJECT_PATH_DEMO }}
-            # git pull origin demo
-            # docker-compose -p demo-cmspndreport -f demo-docker-compose.yml up --build -d --force-recreate
-            # echo "Successfully..."
+            git pull origin demo
+            docker-compose -p demo-cmspndreport -f demo-docker-compose.yml up --build -d --force-recreate
+            echo "Successfully..."
             # docker image prune -a -f
 
       - name: Final call notify
