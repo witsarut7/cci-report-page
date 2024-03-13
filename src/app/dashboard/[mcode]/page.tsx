@@ -13,7 +13,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <DashboardData idCard={user.idCard} mType={user.mType} />
+      <DashboardData mType={user.mType} />
     </>
   );
 }
