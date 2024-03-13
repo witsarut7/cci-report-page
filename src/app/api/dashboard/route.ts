@@ -10,16 +10,16 @@ export async function GET(req: NextRequest) {
     const offset = await getOffset(Number(page), Number(limit));
 
     // data count
-    const idCard = searchParams.get("idCard") as string;
+    const mcode = searchParams.get("mcode") as string;
     const dataCount = await prisma.pnd.count({
-      where: { idcardno: idCard },
+      where: { mcode: mcode },
     });
     const pageCount = await getPageCount(Number(limit), dataCount);
 
     const findPnd = await prisma.pnd.findMany({
-      where: { idcardno: idCard },
+      where: { mcode: mcode },
       skip: offset || 0,
-      take: Number(limit) || 10,
+      take: Number(limit) || 100,
       orderBy: {
         id: "desc",
       },
