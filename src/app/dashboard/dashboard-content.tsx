@@ -7,16 +7,16 @@ import Link from "next/link";
 import GeneratePdf from "./generate-pdf";
 import { FaFilePdf } from "react-icons/fa";
 import { FcDeleteDatabase } from "react-icons/fc";
-import { useParams } from "next/navigation";
 
-export default function DashboardData(userData: { mType: number }) {
-  const param = useParams();
-
+export default function DashboardData(userData: {
+  mType: number;
+  mcode: string;
+}) {
   const [data, setData] = useState<pnd[]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(100);
-  const [mcode, setMcode] = useState(param?.mcode as string);
+  const [mcode, setMcode] = useState(userData.mcode);
 
   useEffect(() => {
     axios

@@ -13,7 +13,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <DashboardData mType={user.mType} />
+      <DashboardData mType={user.mType} mcode={user.mcode} />
     </>
   );
 }

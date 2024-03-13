@@ -5,19 +5,17 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
 import { Prisma, ali_member } from "@prisma/client";
-import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 
-export async function login(idCard: string, param: Params) {
+export async function login(idCard: string, mcode: string) {
   try {
     const member = (await prisma.$queryRaw(
-      Prisma.sql`SELECT * FROM ali_member WHERE id_card = ${idCard} AND mcode = ${param?.mcode};`
+      Prisma.sql`SELECT * FROM ali_member WHERE id_card = ${idCard} OR id_tax = ${idCard} AND mcode = ${mcode};`
     )) as ali_member[];
 
     if (member?.length < 1) {
       return null;
     }
 
-    const mcode = member[0]?.mcode;
     const mType = member[0]?.mtype;
 
     // sign token
@@ -33,7 +31,7 @@ export async function login(idCard: string, param: Params) {
       .sign(secretKey);
 
     cookies().set("token", token);
-    redirect(`/dashboard/${mcode}`);
+    redirect("/dashboard/");
   } catch (error) {
     throw error;
   }
