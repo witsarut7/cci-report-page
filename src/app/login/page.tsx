@@ -8,11 +8,12 @@ export const metadata: Metadata = {
 };
 
 export default function LoginPage() {
-  const getMcode = headers().get("mcode") as string;
+  // get cookie from cms
+  const getAuthPndToken = headers().get("Cookie") as string;
 
   return (
     <>
-      <LoginContent mcode={getMcode} />
+      <LoginContent authPndToken={getAuthPndToken} />
     </>
   );
 }

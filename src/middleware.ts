@@ -4,14 +4,20 @@ import { headers } from "next/headers";
 
 export async function middleware(request: NextRequest) {
   try {
+    // get cookie from cms
+    const getAuthPndToken = headers().get("Cookie") as string;
+
+    // get cookie from login
     const token = request.cookies.get("token")?.value;
-    const getApiKey = headers().get("x-api-key") as string;
     const apiKey = process.env.API_KEY;
 
-    if (getApiKey !== apiKey && !token) {
-      return NextResponse.redirect(
-        new URL(`${process.env.ENDPOINT_REDIRECT}`, request.url)
-      );
+    if (!token) {
+      const getApiKey = await verifyApiKey(getAuthPndToken);
+      if (getApiKey !== apiKey) {
+        return NextResponse.redirect(
+          new URL(`${process.env.ENDPOINT_REDIRECT}`, request.url)
+        );
+      }
     }
 
     // verify token
@@ -41,8 +47,23 @@ export async function middleware(request: NextRequest) {
     }
   } catch (error) {
     return NextResponse.redirect(
-      new URL("`${process.env.ENDPOINT_REDIRECT}`", request.url)
+      new URL(`${process.env.ENDPOINT_REDIRECT}`, request.url)
     );
+  }
+}
+
+async function verifyApiKey(authPndToken: string) {
+  try {
+    const secretJWK = {
+      kty: "oct",
+      k: process.env.JOSE_SECRET,
+    };
+    const secretKey = await importJWK(secretJWK, "HS256");
+    const { payload } = await jwtVerify(authPndToken, secretKey);
+
+    return payload.apiKey as string;
+  } catch (error) {
+    throw error;
   }
 }
 
