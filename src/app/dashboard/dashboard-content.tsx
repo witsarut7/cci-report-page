@@ -9,21 +9,21 @@ import { FaFilePdf } from "react-icons/fa";
 import { FcDeleteDatabase } from "react-icons/fc";
 
 export default function DashboardData(userData: {
-  idCard: string;
   mType: number;
+  mcode: string;
 }) {
   const [data, setData] = useState<pnd[]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(100);
-  const [idCard, setIdCard] = useState(userData.idCard);
+  const [mcode, setMcode] = useState(userData.mcode);
 
   useEffect(() => {
     axios
       .get(
         `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/api/dashboard`,
         {
-          params: { page: page, limit: limit, idCard: idCard },
+          params: { page: page, limit: limit, mcode: mcode },
         }
       )
       .then((response) => {
@@ -33,7 +33,7 @@ export default function DashboardData(userData: {
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
-  }, [page, limit, idCard]);
+  }, [page, limit, mcode]);
 
   const prevPage = page - 1 > 0 ? page - 1 : 1;
   const nextPage = page + 1;
