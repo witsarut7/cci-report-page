@@ -9,11 +9,12 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   // get cookie from cms
-  const getAuthPndToken = headers().get("Cookie") as string;
+  const headerRequest = headers();
+  const getAuthPndToken = JSON.parse(headerRequest.get("mcode") as string);
 
   return (
     <>
-      <LoginContent authPndToken={getAuthPndToken} />
+      <LoginContent mcode={getAuthPndToken.mcode} />
     </>
   );
 }

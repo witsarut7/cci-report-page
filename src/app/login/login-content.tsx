@@ -8,7 +8,7 @@ import { Flip, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
 
-export default function LoginContent(userData: { authPndToken: string }) {
+export default function LoginContent(userData: { mcode: string }) {
   const schema = yup.object().shape({
     idCard: yup.string().required("*กรุณากรอก ID Card"),
   });
@@ -24,7 +24,7 @@ export default function LoginContent(userData: { authPndToken: string }) {
   });
   const onSubmit = async (data: FormData) => {
     const { idCard } = data;
-    const result = await login(idCard, userData.authPndToken);
+    const result = await login(idCard, userData.mcode);
     if (result === null) {
       toast.error("ID Card ไม่ถูกต้อง", {
         position: "top-left",

@@ -6,9 +6,8 @@ import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
 import { Prisma, ali_member } from "@prisma/client";
 
-export async function login(idCard: string, authPndToken: string) {
+export async function login(idCard: string, mcode: string) {
   try {
-    const mcode = await verifyMcode(authPndToken);
     const member = (await prisma.$queryRaw(
       Prisma.sql`SELECT * FROM ali_member WHERE id_card = ${idCard} OR id_tax = ${idCard} AND mcode = ${mcode};`
     )) as ali_member[];
@@ -32,21 +31,6 @@ export async function login(idCard: string, authPndToken: string) {
 
     cookies().set("token", token);
     redirect("/dashboard/");
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function verifyMcode(authPndToken: string) {
-  try {
-    const secret = {
-      kty: "oct",
-      k: process.env.JOSE_SECRET,
-    };
-    const sKey = await importJWK(secret, "HS256");
-    const { payload } = await jwtVerify(authPndToken, sKey);
-
-    return payload.mcode as string;
   } catch (error) {
     throw error;
   }
