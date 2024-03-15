@@ -11,6 +11,7 @@ export async function middleware(request: NextRequest) {
     const apiKey = process.env.API_KEY;
 
     if (!token && getAuthPndToken) {
+      // verify token
       const secretJWK = {
         kty: "oct",
         k: process.env.JOSE_SECRET,
@@ -18,13 +19,14 @@ export async function middleware(request: NextRequest) {
       const secretKey = await importJWK(secretJWK, "HS256");
       const { payload } = await jwtVerify(getAuthPndToken, secretKey);
 
+      // check x-api-key
       if (payload.apiKey !== apiKey) {
         return NextResponse.redirect(
           new URL(`${process.env.ENDPOINT_REDIRECT}`, request.url)
         );
       }
 
-      // set user from header
+      // set mcode from header
       const requestHeaders = new Headers(request.headers);
       requestHeaders.set(
         "mcode",

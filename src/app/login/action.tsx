@@ -9,7 +9,7 @@ import { Prisma, ali_member } from "@prisma/client";
 export async function login(idCard: string, mcode: string) {
   try {
     const member = (await prisma.$queryRaw(
-      Prisma.sql`SELECT * FROM ali_member WHERE id_card = ${idCard} OR id_tax = ${idCard} AND mcode = ${mcode};`
+      Prisma.sql`SELECT * FROM ali_member WHERE (id_card = ${idCard} OR id_tax = ${idCard}) AND mcode = ${mcode};`
     )) as ali_member[];
 
     if (member?.length < 1) {
