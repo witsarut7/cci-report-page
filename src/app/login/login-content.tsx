@@ -8,7 +8,7 @@ import { Flip, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
 
-export default function LoginContent(userData: { authPndToken: string }) {
+export default function LoginContent(userData: { mcode: string }) {
   const schema = yup.object().shape({
     idCard: yup.string().required("*กรุณากรอก ID Card"),
   });
@@ -24,7 +24,7 @@ export default function LoginContent(userData: { authPndToken: string }) {
   });
   const onSubmit = async (data: FormData) => {
     const { idCard } = data;
-    const result = await login(idCard, userData.authPndToken);
+    const result = await login(idCard, userData.mcode);
     if (result === null) {
       toast.error("ID Card ไม่ถูกต้อง", {
         position: "top-left",
@@ -69,7 +69,10 @@ export default function LoginContent(userData: { authPndToken: string }) {
           </div>
           <div className="mt-2">
             {isSubmitting ? (
-              <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600">
+              <button
+                disabled={isSubmitting}
+                className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
+              >
                 <svg
                   aria-hidden="true"
                   role="status"

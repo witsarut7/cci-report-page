@@ -1,5 +1,17 @@
-export default function Loading() {
-  // You can add any UI inside Loading, including a Skeleton.
+"use client";
+
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { setCmsToken } from "./action";
+
+export default function PageRedirect() {
+  const param = useParams();
+
+  const [token, setToken] = useState<string>(param.token as string);
+  useEffect(() => {
+    setCmsToken(token);
+  });
+
   return (
     <div className="flex items-center justify-center min-h-screen">
       <svg
