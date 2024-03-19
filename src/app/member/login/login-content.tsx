@@ -43,35 +43,33 @@ export default function LoginContent(userData: { mcode: string }) {
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">
-      <Image
-        width={150}
-        height={100}
-        src={"/cci-logo.png"}
-        alt="Picture of the author"
-      />
       <ToastContainer stacked />
-      <div className="w-full p-6 bg-white rounded-md shadow-md lg:max-w-xl">
-        <form className="mt-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-4">
-            <label
-              htmlFor="idCard"
-              className="block text-sm font-semibold text-gray-800"
-            >
+      <div className="p-14 bg-white rounded-3xl  shadow-md lg:max-w-xl flex items-center justify-center flex-col md:w-[400px] md:h-[440px]">
+        <Image
+          width={160}
+          height={160}
+          src={"/cci-logo.png"}
+          alt="Picture of the author"
+        />
+        <form className="mt-8" onSubmit={handleSubmit(onSubmit)}>
+          <div className="mb-8">
+            <label htmlFor="idCard" className="block md:text-base">
               ID Card
             </label>
             <input
               {...register("idCard")}
-              className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:border-gray-400 focus:ring-gray-300 focus:outline-none focus:ring focus:ring-opacity-40"
+              placeholder="กรอก ID Card"
+              className="md:text-base md:w-[288px] md:h-[40px] block px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
             />
-            {errors.idCard && (
+            {/* {errors.idCard && (
               <span className="text-red-700">{errors.idCard.message}</span>
-            )}
+            )} */}
           </div>
           <div className="mt-2">
             {isSubmitting ? (
               <button
                 disabled={isSubmitting}
-                className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
+                className="md:text-base w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-blue-600 rounded-md focus:outline-none focus:bg-blue-600"
               >
                 <svg
                   aria-hidden="true"
@@ -93,8 +91,8 @@ export default function LoginContent(userData: { mcode: string }) {
                 Loading...
               </button>
             ) : (
-              <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600">
-                Submit
+              <button className="md:text-base w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
+                ยืนยัน
               </button>
             )}
           </div>

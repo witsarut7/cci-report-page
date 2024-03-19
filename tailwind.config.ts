@@ -13,6 +13,7 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
         "cci-logo": "url('/cci-logo.png')",
+        "data-not-found.png": "url(data-not-found.png)",
       },
       fontFamily: {
         sans: ['"Segoe UI"', "Roboto", "sans-serif"],

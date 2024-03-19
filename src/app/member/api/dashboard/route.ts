@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       pnd: findPnd,
+      count: dataCount,
       pageCount,
     });
   } catch (error) {

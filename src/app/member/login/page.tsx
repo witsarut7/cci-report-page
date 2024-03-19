@@ -12,8 +12,8 @@ export default function LoginPage() {
   const getAuthPndToken = JSON.parse(headerRequest.get("mcode") as string);
 
   return (
-    <>
+    <div className="bg-[#CDD8FF]">
       <LoginContent mcode={getAuthPndToken.mcode} />
-    </>
+    </div>
   );
 }

@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // verify token
-    if (token && request.nextUrl.pathname.startsWith("/dashboard")) {
+    if (token && request.nextUrl.pathname.startsWith("/member/dashboard")) {
       const secretJWK = {
         kty: "oct",
         k: process.env.JOSE_SECRET,
@@ -78,5 +78,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login/:path*"],
+  matcher: ["/member/dashboard/:path*", "/member/login/:path*"],
 };
