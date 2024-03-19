@@ -1,6 +1,6 @@
 "use server";
 
-import { SignJWT, importJWK, jwtVerify } from "jose";
+import { SignJWT, importJWK } from "jose";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
@@ -30,7 +30,7 @@ export async function login(idCard: string, mcode: string) {
       .sign(secretKey);
 
     cookies().set("token", token);
-    redirect("/dashboard/");
+    redirect("/member/dashboard/");
   } catch (error) {
     throw error;
   }

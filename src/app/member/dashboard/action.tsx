@@ -3,15 +3,14 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
-export async function setCmsToken(token: string) {
+export async function logout() {
   try {
     // clear cookies
     cookies().delete("token");
     cookies().delete("cmsToken");
 
     // set cookies and redirect URL
-    cookies().set("cmsToken", token);
-    redirect("/login");
+    redirect(`${process.env.ENDPOINT_REDIRECT}`);
   } catch (error) {
     throw error;
   }
