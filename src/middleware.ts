@@ -6,11 +6,15 @@ export async function middleware(request: NextRequest) {
     // get cookie from cms
     const getAuthPndToken = request.cookies.get("cmsToken")?.value as string;
 
-    // get cookie from login
+    // get cookie from member login
     const token = request.cookies.get("token")?.value;
     const apiKey = process.env.API_KEY;
 
-    if (!token && getAuthPndToken) {
+    if (
+      !token &&
+      getAuthPndToken &&
+      request.nextUrl.pathname.startsWith("/member/login")
+    ) {
       // verify token
       const secretJWK = {
         kty: "oct",
@@ -65,7 +69,10 @@ export async function middleware(request: NextRequest) {
       });
 
       return response;
-    } else {
+    } else if (
+      !token &&
+      request.nextUrl.pathname.startsWith("/member/dashboard")
+    ) {
       return NextResponse.redirect(
         new URL(`${process.env.ENDPOINT_REDIRECT}`, request.url)
       );
