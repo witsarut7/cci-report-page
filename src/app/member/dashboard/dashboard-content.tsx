@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { pnd } from "@prisma/client";
-import Link from "next/link";
 import GeneratePdf from "./generate-pdf";
 import { AiFillFilePdf } from "react-icons/ai";
 import { MdLogout } from "react-icons/md";
@@ -51,7 +50,7 @@ export default function DashboardData(userData: {
     }
   }
 
-  const onClick = async () => {
+  const handleLogout = async () => {
     await logout();
     return false;
   };
@@ -61,7 +60,7 @@ export default function DashboardData(userData: {
       {/* header */}
       <div className="mb-4 justify-between items-start flex-row flex">
         <p className="md:text-2xl font-bold">รายการข้อมูลกำกับภาษี</p>
-        <div onClick={onClick} className="flex cursor-pointer gap-2">
+        <div onClick={handleLogout} className="flex cursor-pointer gap-2">
           <p className="text-[#D03232] md:text-base">ออกจากระบบ</p>
           <MdLogout className="w-5 h-5 text-[#D03232]" />
         </div>
@@ -112,31 +111,39 @@ export default function DashboardData(userData: {
                       className="bg-white border-b dark:border-[#D9D9D9]"
                     >
                       <td className="px-5 py-4 text-left text-sm">
-                        {item?.docno}
+                        {item.docno ? item.docno : "-"}
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
-                        {item?.name}
+                        {item.name ? item.name : "-"}
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
-                        {item?.address}
+                        {item.address ? item.address : "-"}
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
-                        {item?.idcardno}
+                        {item.idcardno ? item.idcardno : "-"}
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
-                        {item?.datepaid}
+                        {item.datepaid ? item.datepaid : "-"}
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
-                        {item?.incometype}
+                        {item.incometype ? item.incometype : "-"}
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
-                        {item?.percentage}
+                        {item.percentage ? item.percentage : "-"}
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
-                        {String(item?.income)}
+                        {item.income
+                          ? Intl.NumberFormat("en-US", {
+                              minimumFractionDigits: 2,
+                            }).format(Number(item?.income))
+                          : "-"}
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
-                        {String(item?.wht)}
+                        {item.wht
+                          ? Intl.NumberFormat("en-US", {
+                              minimumFractionDigits: 2,
+                            }).format(Number(item?.wht))
+                          : "-"}
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
                         <button
@@ -180,7 +187,7 @@ export default function DashboardData(userData: {
             <p className="text-sm">
               showing {data.length} to {limit} of {count} results
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-4 cursor-default">
               <nav
                 className="isolate inline-flex -space-x-px rounded-md shadow-sm"
                 aria-label="Pagination"
@@ -198,15 +205,14 @@ export default function DashboardData(userData: {
                       aria-hidden="true"
                     >
                       <path
-                        fill-rule="evenodd"
+                        fillRule="evenodd"
                         d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
-                        clip-rule="evenodd"
+                        clipRule="evenodd"
                       />
                     </svg>
                   </a>
                 ) : (
-                  <Link
-                    href={`?page=${prevPage}`}
+                  <div
                     aria-label="Previous Page"
                     onClick={() => {
                       setPage(prevPage);
@@ -221,28 +227,27 @@ export default function DashboardData(userData: {
                       aria-hidden="true"
                     >
                       <path
-                        fill-rule="evenodd"
+                        fillRule="evenodd"
                         d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
-                        clip-rule="evenodd"
+                        clipRule="evenodd"
                       />
                     </svg>
-                  </Link>
+                  </div>
                 )}
                 {pageNumbers.map((pageNumber, index) => (
-                  <Link
+                  <div
                     key={index}
                     className={
                       page === pageNumber
                         ? "relative z-10 inline-flex items-center bg-[#002DCD] px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#002DCD]"
                         : "relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                     }
-                    href={`?page=${pageNumber}`}
                     onClick={() => {
                       setPage(pageNumber);
                     }}
                   >
                     {pageNumber}
-                  </Link>
+                  </div>
                 ))}
                 {page === pageCount ? (
                   <a className="opacity-60 text-sm cursor-not-allowed relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
@@ -254,15 +259,14 @@ export default function DashboardData(userData: {
                       aria-hidden="true"
                     >
                       <path
-                        fill-rule="evenodd"
+                        fillRule="evenodd"
                         d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                        clip-rule="evenodd"
+                        clipRule="evenodd"
                       />
                     </svg>
                   </a>
                 ) : (
-                  <Link
-                    href={`?page=${nextPage}`}
+                  <div
                     aria-label="Next Page"
                     onClick={() => {
                       setPage(nextPage);
@@ -277,12 +281,12 @@ export default function DashboardData(userData: {
                       aria-hidden="true"
                     >
                       <path
-                        fill-rule="evenodd"
+                        fillRule="evenodd"
                         d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                        clip-rule="evenodd"
+                        clipRule="evenodd"
                       />
                     </svg>
-                  </Link>
+                  </div>
                 )}
               </nav>
             </div>
