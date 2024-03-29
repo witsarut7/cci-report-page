@@ -30,7 +30,7 @@ export async function login(idCard: string, mcode: string) {
       .sign(secretKey);
 
     cookies().set("token", token);
-    redirect("/member/dashboard/");
+    redirect("/member/dashboard");
   } catch (error) {
     throw error;
   }

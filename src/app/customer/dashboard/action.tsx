@@ -6,10 +6,9 @@ import { cookies } from "next/headers";
 export async function logout() {
   try {
     // clear cookies
-    cookies().delete("token");
-    cookies().delete("cmsToken");
+    cookies().delete("back-office");
 
-    redirect(`${process.env.ENDPOINT_REDIRECT}`);
+    redirect("/customer/login");
   } catch (error) {
     throw error;
   }

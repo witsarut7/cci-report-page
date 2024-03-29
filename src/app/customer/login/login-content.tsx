@@ -7,10 +7,13 @@ import { login } from "./action";
 import { Flip, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
+import { useState } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
-export default function LoginContent(userData: { mcode: string }) {
+export default function LoginContent() {
   const schema = yup.object().shape({
-    idCard: yup.string().required("*กรุณากรอก ID Card"),
+    email: yup.string().required("*กรุณากรอก email"),
+    password: yup.string().required("*กรุณากรอกรหัสผ่าน"),
   });
   type FormData = yup.InferType<typeof schema>;
 
@@ -23,10 +26,10 @@ export default function LoginContent(userData: { mcode: string }) {
     mode: "all",
   });
   const onSubmit = async (data: FormData) => {
-    const { idCard } = data;
-    const result = await login(idCard, userData.mcode);
-    if (result === null) {
-      toast.error("ID Card ไม่ถูกต้อง", {
+    const { email, password } = data;
+    const result = await login(email, password);
+    if (result?.status === 401) {
+      toast.error(`${result.message}`, {
         position: "top-left",
         autoClose: 5000,
         hideProgressBar: false,
@@ -41,10 +44,15 @@ export default function LoginContent(userData: { mcode: string }) {
     return false;
   };
 
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">
       <ToastContainer stacked />
-      <div className="p-14 bg-white rounded-3xl shadow-md lg:max-w-xl flex items-center justify-center flex-col md:w-[400px] md:h-[440px]">
+      <div className="p-14 bg-white rounded-3xl shadow-md lg:max-w-xl flex items-center justify-center flex-col md:w-[400px] md:h-[536px]">
         <Image
           width={160}
           height={160}
@@ -53,18 +61,48 @@ export default function LoginContent(userData: { mcode: string }) {
         />
         <form className="mt-8" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-8">
-            <label htmlFor="idCard" className="block md:text-base">
-              ID Card
+            <label htmlFor="email" className="block md:text-base">
+              อีเมล
             </label>
             <input
-              {...register("idCard")}
-              placeholder="กรอก ID Card"
+              {...register("email")}
+              type="email"
+              placeholder="กรอกอีเมล"
               className="md:text-base md:w-[288px] md:h-[40px] block px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
             />
-            {/* {errors.idCard && (
-              <span className="text-red-700">{errors.idCard.message}</span>
+            {/* {errors.email && (
+              <span className="text-red-700">{errors.email.message}</span>
             )} */}
           </div>
+
+          <div className="mb-8">
+            <label htmlFor="password" className="block md:text-base">
+              รหัสผ่าน
+            </label>
+            <div className="relative">
+              <input
+                {...register("password")}
+                type={passwordVisible ? "text" : "password"}
+                placeholder="กรอกรหัสผ่าน"
+                className="md:text-base md:w-[288px] md:h-[40px] block px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+              />
+              {/* {errors.password && (
+              <span className="text-red-700">{errors.password.message}</span>
+            )} */}
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 px-3 py-2 bg-transparent"
+              >
+                {passwordVisible ? (
+                  <AiOutlineEye className="md:w-[24px] md:h-[24px] text-[#A6A6A6]" />
+                ) : (
+                  <AiOutlineEyeInvisible className="md:w-[24px] md:h-[24px] text-[#A6A6A6]" />
+                )}
+              </button>
+            </div>
+          </div>
+
           <div className="mt-2">
             {isSubmitting ? (
               <button
