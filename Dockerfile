@@ -24,4 +24,4 @@ COPY --from=builder /app/node_modules/.prisma/client  ./node_modules/.prisma/cli
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]
