@@ -15,12 +15,13 @@ export async function login(email: string, password: string) {
         },
       })
       .then((res) => {
-        return { status: res.status, message: res.data.message };
+        return { status: res.status, message: res.data.message, test: "test" };
       })
       .catch((error) => {
         return {
           status: error?.response?.status as number,
           message: error?.response?.data?.error?.message as string,
+          test: "test",
         };
       });
 
