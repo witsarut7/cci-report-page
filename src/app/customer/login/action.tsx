@@ -7,6 +7,8 @@ import axios from "axios";
 
 export async function login(email: string, password: string) {
   try {
+    console.log("e:", email);
+    console.log("p:", password);
     const response = await axios
       .get(`${process.env.DEALER_SERVICE_URL}`, {
         data: {
@@ -15,15 +17,15 @@ export async function login(email: string, password: string) {
         },
       })
       .then((res) => {
-        return { status: res.status, message: res.data.message, test: "test" };
+        return { status: res.status, message: res.data.message };
       })
       .catch((error) => {
         return {
           status: error?.response?.status as number,
           message: error?.response?.data?.error?.message as string,
-          test: "test",
         };
       });
+    console.log({ response });
 
     if (response.status === 200) {
       // sign token

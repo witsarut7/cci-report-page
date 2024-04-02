@@ -27,7 +27,12 @@ export default function LoginContent() {
   });
   const onSubmit = async (data: FormData) => {
     const { email, password } = data;
+    console.log({ email });
+    console.log({ password });
+
     const result = await login(email, password);
+    console.log({ result });
+
     if (result?.status === 401) {
       toast.error(`${result.message}`, {
         position: "top-left",
