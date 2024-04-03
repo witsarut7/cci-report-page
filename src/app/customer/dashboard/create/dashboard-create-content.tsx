@@ -1,20 +1,23 @@
-"use client";
+"use client"
 
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import axios from "axios";
-import { useState } from "react";
-import Datepicker from "react-tailwindcss-datepicker";
-import moment from "moment";
-import * as Yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
+import {useRouter} from "next/navigation"
+import {useForm} from "react-hook-form"
+import axios from "axios"
+import {useState} from "react"
+import Datepicker from "react-tailwindcss-datepicker"
+import moment from "moment"
+import * as Yup from "yup"
+import {yupResolver} from "@hookform/resolvers/yup"
+import Select from "react-select"
+import {selectStyles} from "../../../../styles/SelectStyle"
 
 export default function DashboardCreate() {
-  const router = useRouter();
+  const router = useRouter()
   const [datepaid, setDatepaid] = useState<any>({
     startDate: null,
     endDate: null,
-  });
+  })
+  const [saleChannelTemp, setSaleChannelTemp] = useState()
 
   const schema = Yup.object().shape({
     docno: Yup.string().required("กรุณากรอก ภงด."),
@@ -32,7 +35,7 @@ export default function DashboardCreate() {
         "is-decimal-2",
         "จำนวนเงินต้องมีจุดทศนิยมไม่เกิน 2 ตำแหน่ง",
         (value) => {
-          return /^\d+(\.\d{1,2})?$/.test(value.replace(/,/g, ""));
+          return /^\d+(\.\d{1,2})?$/.test(value.replace(/,/g, ""))
         }
       ),
     wht: Yup.string()
@@ -41,50 +44,70 @@ export default function DashboardCreate() {
         "is-decimal-2",
         "จำนวนเงินต้องมีจุดทศนิยมไม่เกิน 2 ตำแหน่ง",
         (value) => {
-          return /^\d+(\.\d{1,2})?$/.test(value.replace(/,/g, ""));
+          return /^\d+(\.\d{1,2})?$/.test(value.replace(/,/g, ""))
         }
       ),
     mcode: Yup.string().required("กรุณากรอก รหัสนักธุรกิจ"),
-  });
+  })
 
-  type FormData = Yup.InferType<typeof schema>;
+  type FormData = Yup.InferType<typeof schema>
 
   const {
     register,
     setValue,
     handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>({ resolver: yupResolver(schema) });
+    formState: {errors},
+  } = useForm<FormData>({resolver: yupResolver(schema)})
 
   const decimalNumber = async (value: string) => {
-    const numberWithCommasRemoved: string = value.replace(/,/g, "");
-    const decimalNumber: number = parseFloat(numberWithCommasRemoved);
-    return decimalNumber;
-  };
+    const numberWithCommasRemoved: string = value.replace(/,/g, "")
+    const decimalNumber: number = parseFloat(numberWithCommasRemoved)
+    return decimalNumber
+  }
 
+  const incometypeOption = [
+    {
+      label: "สินค้าทั่วไป",
+      value: 1,
+    },
+    {
+      label: "โปรโมชัน",
+      value: 2,
+    },
+    {
+      label: "ส่งเสริมการตลาด",
+      value: 3,
+    },
+    {
+      label: "ตัวแถม",
+      value: 4,
+    },
+  ]
   const onSubmit = async (data: FormData) => {
-    const income = await decimalNumber(data.income);
-    const wht = await decimalNumber(data.wht);
+    console.log('data', data)
+    console.log('first', saleChannelTemp)
+    // const income = await decimalNumber(data.income)
+    // const wht = await decimalNumber(data.wht)
 
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/dashboard`,
-      {
-        docno: data.docno,
-        name: data.name,
-        address: data.address,
-        idcardno: data.idcardno,
-        datepaid: moment(datepaid.startDate, "YYYY-MM-DD").format("DD/MM/YYYY"),
-        incometype: data.incometype,
-        percentage: Number(data.percentage),
-        income: income,
-        wht: wht,
-        mcode: data.mcode,
-      }
-    );
-    if (response.status === 200) {
-      router.replace("/customer/dashboard", { scroll: true });
-    }
-  };
+    // const response = await axios.post(
+    //   `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/dashboard`,
+    //   {
+    //     docno: data.docno,
+    //     name: data.name,
+    //     address: data.address,
+    //     idcardno: data.idcardno,
+    //     datepaid: moment(datepaid.startDate, "YYYY-MM-DD").format("DD/MM/YYYY"),
+    //     incometype: data.incometype,
+    //     percentage: Number(data.percentage),
+    //     income: income,
+    //     wht: wht,
+    //     mcode: data.mcode,
+    //   }
+    // )
+    // if (response.status === 200) {
+    //   router.replace("/customer/dashboard", {scroll: true})
+    // }
+  }
 
   return (
     <div className="p-14 mx-2">
@@ -158,8 +181,8 @@ export default function DashboardCreate() {
                 primaryColor={"blue"}
                 value={datepaid}
                 onChange={(value: any) => {
-                  setDatepaid(value);
-                  setValue("datepaid", value.startDate);
+                  setDatepaid(value)
+                  setValue("datepaid", value.startDate)
                 }}
                 displayFormat={"DD/MM/YYYY"}
                 startWeekOn="mon"
@@ -183,6 +206,35 @@ export default function DashboardCreate() {
                 }
                 {...register("incometype")}
               />
+              <Select
+              value={{label: saleChannelTemp || "เลือกร้านค้า"}}
+              onChange={(value : any) => {
+                setSaleChannelTemp(value.value),
+                {...register("incometype")}
+                
+              }}
+              options={[
+                {
+                  "label": "สินค้าทั่วไป",
+                  "value": "สินค้าทั่วไป"
+              },
+              {
+                  "label": "โปรโมชัน",
+                  "value": "โปรโมชัน"
+              },
+              {
+                  "label": "ส่งเสริมการตลาด",
+                  "value": "ส่งเสริมการตลาด"
+              },
+              {
+                  "label": "ตัวแถม",
+                  "value": "ตัวแถม"
+              }
+              ]}
+              placeholder="เลือกสินค้า"
+              styles={selectStyles}
+              className="h-10 md:h-ct50"
+            />
             </div>
             <div>
               <p className="xl:text-base mb-2">
@@ -274,7 +326,7 @@ export default function DashboardCreate() {
             <button
               type="button"
               onClick={() => {
-                router.replace("/customer/dashboard", { scroll: true });
+                router.replace("/customer/dashboard", {scroll: true})
               }}
               className="md:text-base md:w-[69px] md:h-[40px] p-2 tracking-wide text-black transition-colors duration-200 transform bg-[#FFFFFF] rounded-md hover:bg-[#C0C0C0] focus:outline-nonefocus:bg-[#C0C0C0] border"
             >
@@ -287,5 +339,5 @@ export default function DashboardCreate() {
         </div>
       </form>
     </div>
-  );
+  )
 }
