@@ -55,6 +55,8 @@ model ali_ac {
   btype        String?  @db.VarChar(10)
   pv           Decimal  @db.Decimal(15, 2)
   percer       Decimal  @db.Decimal(15, 2)
+  rebatePv     Decimal? @db.Decimal(15, 2)
+  rebate       Decimal? @db.Decimal(15, 2)
   total        Decimal  @db.Decimal(15, 2)
   fdate        DateTime @db.Date
   tdate        DateTime @db.Date
@@ -151,6 +153,7 @@ model ali_ambonus {
   rcode        Int
   mcode        String   @db.VarChar(255)
   name_t       String   @db.VarChar(255)
+  rebate       Decimal  @default(0.00) @db.Decimal(15, 2)
   total        Decimal  @db.Decimal(15, 2)
   tot_pv       Decimal  @db.Decimal(12, 5)
   tax          Decimal  @db.Decimal(15, 2)
@@ -1053,6 +1056,7 @@ model ali_commission {
   id                  Int      @id @default(autoincrement())
   mcode               String   @db.VarChar(255)
   name_t              String   @db.VarChar(255)
+  rebate              Decimal? @default(0.00) @db.Decimal(15, 2)
   ambonus             Decimal  @db.Decimal(15, 2)
   bmbonus             Decimal  @db.Decimal(15, 2)
   dmbonus             Decimal  @db.Decimal(15, 2)
@@ -1086,19 +1090,25 @@ model ali_commission {
 }
 
 model ali_commission_b {
-  id        Int      @id @default(autoincrement())
-  mcode     String   @db.VarChar(255)
-  name_t    String   @db.VarChar(255)
-  pos_cur3  String   @db.VarChar(255)
-  dmbonus   Decimal  @db.Decimal(15, 2)
-  embonus   Decimal  @db.Decimal(15, 2)
-  total     Decimal  @db.Decimal(15, 2)
-  rcode     Int
-  fdate     DateTime @db.Date
-  tdate     DateTime @db.Date
-  member_id Int?
-  ato       Decimal? @db.Decimal(10, 2)
-  sano_ato  String   @db.VarChar(255)
+  id                  Int      @id @default(autoincrement())
+  mcode               String   @db.VarChar(255)
+  name_t              String   @db.VarChar(255)
+  pos_cur3            String   @db.VarChar(255)
+  dmbonus             Decimal  @db.Decimal(15, 2)
+  embonus             Decimal  @db.Decimal(15, 2)
+  total               Decimal  @db.Decimal(15, 2)
+  rcode               Int
+  fdate               DateTime @db.Date
+  tdate               DateTime @db.Date
+  member_id           Int?
+  ato                 Decimal? @db.Decimal(10, 2)
+  sano_ato            String   @db.VarChar(255)
+  com_transfer_charge Decimal? @db.Decimal(6, 2)
+  vat                 Decimal? @db.Decimal(15, 2)
+  tax                 Decimal? @db.Decimal(15, 2)
+  percen_tax          Decimal? @db.Decimal(15, 2)
+  total_annual        Decimal? @db.Decimal(15, 2)
+  old_bonus           Decimal? @db.Decimal(15, 2)
 
   @@index([member_id], map: "ali_commission_b_member_id_3e7c4c97")
   @@index([fdate], map: "fdate")
@@ -6483,6 +6493,33 @@ model pnd {
   date_added  DateTime @default(now()) @db.DateTime(0)
   date_modify DateTime @default(now()) @db.Timestamp(0)
   mcode       String   @db.VarChar(255)
+}
+
+model ali_structure_sponsor_tmp {
+  id          Int    @id @default(autoincrement()) @db.UnsignedInt
+  mcode_index String @db.VarChar(1000)
+  mcode_ref   String @db.VarChar(255)
+  tot_pv      Int
+  level       Int
+
+  @@index([level], map: "level")
+  @@index([mcode_index(length: 767)], map: "mcode_index")
+  @@index([mcode_ref], map: "mcode_ref")
+  @@index([tot_pv], map: "tot_pv")
+}
+
+model pnd_income_type {
+  id          Int      @id @default(autoincrement())
+  date_added  DateTime @default(now()) @db.DateTime(0)
+  date_modify DateTime @default(now()) @db.Timestamp(0)
+  incometype  String   @db.VarChar(255)
+}
+
+model pnd_percentage {
+  id          Int      @id @default(autoincrement())
+  date_added  DateTime @default(now()) @db.DateTime(0)
+  date_modify DateTime @default(now()) @db.Timestamp(0)
+  percentage  Int
 }
 
 enum ali_news_status {

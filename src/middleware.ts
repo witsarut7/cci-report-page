@@ -80,6 +80,14 @@ export async function middleware(request: NextRequest) {
       });
 
       return response;
+    } else if (
+      !token &&
+      !getAuthPndToken &&
+      request.nextUrl.pathname.startsWith("/member/login")
+    ) {
+      return NextResponse.redirect(
+        new URL(`${process.env.ENDPOINT_REDIRECT}`, request.url)
+      );
     }
 
     // verify token

@@ -466,14 +466,20 @@ export default function GeneratePdf(data: pnd, mType: number) {
                   border: [true, false, false, false],
                   text: [
                     "2. ค่าธรรมเนียม ",
-                    {
-                      text: "ค่านายหน้า",
-                      fontSize: 13,
-                      bold: true,
-                      decoration: "underline",
-                      decorationStyle: "solid",
-                      decorationColor: "black",
-                    },
+                    data.incometype === "ค่านายหน้า"
+                      ? {
+                          text: "ค่านายหน้า",
+                          fontSize: 11,
+                          bold: true,
+                          decoration: "underline",
+                          decorationStyle: "solid",
+                          decorationColor: "black",
+                        }
+                      : {
+                          text: "ค่านายหน้า",
+                          fontSize: 11,
+                        },
+                    ,
                     {
                       text: " ที่ปรึกษา ฯลฯ ตามมาตรา 40 (2)",
                       fontSize: 11,
@@ -796,12 +802,49 @@ export default function GeneratePdf(data: pnd, mType: number) {
               [
                 {
                   border: [true, false, false, false],
-                  text: "5. การจ่ายเงินได้ที่ต้องหักภาษี ณ ที่จ่ายตามคำสั่งกรมสรรพากร ที่ออกตามมาตรา 3 เตรส เช่น รางวัล ส่วนลดหรือประโยชน์ใด ๆ เนื่องจากการส่งเสริมการขาย รางวัลในการประกวด การแข่งขัน การชิงโชค ค่าแสดงของนักแสดงสาธารณะ ค่าจ้างทำของ ค่าโฆษณา ค่าเช่า ค่าขนส่ง ค่าบริการ ค่าเบี้ยประกันวินาศภัย ฯลฯ",
+                  text: [
+                    "5. การจ่ายเงินได้ที่ต้องหักภาษี ณ ที่จ่ายตามคำสั่งกรมสรรพากร ที่ออกตามมาตรา 3 เตรส เช่น ",
+                    data.incometype === "รางวัล"
+                      ? {
+                          text: "รางวัล",
+                          fontSize: 11,
+                          bold: true,
+                          decoration: "underline",
+                          decorationStyle: "solid",
+                          decorationColor: "black",
+                        }
+                      : {
+                          text: "รางวัล",
+                          fontSize: 11,
+                        },
+                    {
+                      text: " ส่วนลดหรือประโยชน์ใด ๆ เนื่องจาก ",
+                      fontSize: 11,
+                    },
+                    data.incometype === "ส่งเสริมการขาย"
+                      ? {
+                          text: "การส่งเสริมการขาย",
+                          fontSize: 11,
+                          bold: true,
+                          decoration: "underline",
+                          decorationStyle: "solid",
+                          decorationColor: "black",
+                        }
+                      : {
+                          text: "การส่งเสริมการขาย",
+                          fontSize: 11,
+                        },
+                    {
+                      text: "รางวัลในการประกวด การแข่งขัน การชิงโชค ค่าแสดงของนักแสดงสาธารณะ ค่าจ้างทำของ ค่าโฆษณา ค่าเช่า ค่าขนส่ง ค่าบริการ ค่าเบี้ยประกันวินาศภัย ฯลฯ",
+                      fontSize: 11,
+                    },
+                  ],
                   alignment: "left",
                   fontSize: 11,
                   margin: [30, 0, 0, 0],
                 },
-                data.incometype === "ค่าจ้าง"
+                data.incometype === "รางวัล" ||
+                data.incometype === "ส่งเสริมการขาย"
                   ? {
                       border: [true, false, false, false],
                       text: `\n\n\n${data?.datepaid}`,
@@ -814,7 +857,8 @@ export default function GeneratePdf(data: pnd, mType: number) {
                       alignment: "center",
                       fontSize: 11,
                     },
-                data.incometype === "ค่าจ้าง"
+                data.incometype === "รางวัล" ||
+                data.incometype === "ส่งเสริมการขาย"
                   ? {
                       border: [true, false, false, false],
                       text: `\n\n\n${NumZeroFormat(data?.income)}`,
@@ -827,7 +871,8 @@ export default function GeneratePdf(data: pnd, mType: number) {
                       alignment: "right",
                       fontSize: 11,
                     },
-                data.incometype === "ค่าจ้าง"
+                data.incometype === "รางวัล" ||
+                data.incometype === "ส่งเสริมการขาย"
                   ? {
                       border: [true, false, true, false],
                       text: `\n\n\n${NumZeroFormat(data?.wht)}`,
@@ -933,38 +978,38 @@ export default function GeneratePdf(data: pnd, mType: number) {
           image: "unchecked",
           height: 7,
           width: 7,
-          absolutePosition: { x: 64, y: 371.9 },
+          absolutePosition: { x: 64, y: 369.4 },
         },
         {
           image: "unchecked",
           height: 7,
           width: 7,
-          absolutePosition: { x: 64, y: 391.2 },
+          absolutePosition: { x: 64, y: 388.4 },
         },
         {
           image: "unchecked",
           height: 7,
           width: 7,
-          absolutePosition: { x: 64, y: 410.5 },
+          absolutePosition: { x: 64, y: 408.4 },
         },
         {
           image: "unchecked",
           height: 7,
           width: 7,
-          absolutePosition: { x: 64, y: 429.8 },
+          absolutePosition: { x: 64, y: 427.4 },
         },
         // checkbox (2), (3)
         {
           image: "unchecked",
           height: 7,
           width: 7,
-          absolutePosition: { x: 52, y: 449.5 },
+          absolutePosition: { x: 52, y: 446.8 },
         },
         {
           image: "unchecked",
           height: 7,
           width: 7,
-          absolutePosition: { x: 52, y: 468.5 },
+          absolutePosition: { x: 52, y: 465.8 },
         },
         {
           canvas: [
@@ -1151,25 +1196,25 @@ export default function GeneratePdf(data: pnd, mType: number) {
           image: "checked",
           height: 7,
           width: 7,
-          absolutePosition: { x: 55, y: 744 },
+          absolutePosition: { x: 55, y: 741.5 },
         },
         {
           image: "unchecked",
           height: 7,
           width: 7,
-          absolutePosition: { x: 55, y: 762.3 },
+          absolutePosition: { x: 55, y: 759.8 },
         },
         {
           image: "unchecked",
           height: 7,
           width: 7,
-          absolutePosition: { x: 55, y: 780.6 },
+          absolutePosition: { x: 55, y: 778.1 },
         },
         {
           image: "unchecked",
           height: 7,
           width: 7,
-          absolutePosition: { x: 55, y: 798.9 },
+          absolutePosition: { x: 55, y: 796.9 },
         },
         {
           canvas: [
@@ -1207,7 +1252,7 @@ export default function GeneratePdf(data: pnd, mType: number) {
           image: "signature",
           height: 27,
           width: 55,
-          absolutePosition: { x: 235, y: 764 },
+          absolutePosition: { x: 235, y: 761 },
         },
       ],
       defaultStyle: {

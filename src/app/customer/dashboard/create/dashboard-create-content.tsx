@@ -3,11 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 import moment from "moment";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { selectStyles } from "@/styles/select-style";
+import Select from "react-select";
+import { pnd_income_type, pnd_percentage } from "@prisma/client";
 
 export default function DashboardCreate() {
   const router = useRouter();
@@ -15,6 +18,8 @@ export default function DashboardCreate() {
     startDate: null,
     endDate: null,
   });
+  const [incometypeOption, setIncometypeOption] = useState<pnd_income_type[]>();
+  const [percentageOption, setPercentageOption] = useState<pnd_percentage[]>();
 
   const schema = Yup.object().shape({
     docno: Yup.string().required("กรุณากรอก ภงด."),
@@ -56,6 +61,34 @@ export default function DashboardCreate() {
     formState: { errors },
   } = useForm<FormData>({ resolver: yupResolver(schema) });
 
+  useEffect(() => {
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/income-type`
+      )
+      .then((response) => {
+        const pndIncomeTypeData = response.data
+          .pnd_income_type as pnd_income_type[];
+        setIncometypeOption(pndIncomeTypeData);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/percentage`
+      )
+      .then((response) => {
+        const pndPercentageData = response.data
+          .pnd_percentage as pnd_percentage[];
+        setPercentageOption(pndPercentageData);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+
   const decimalNumber = async (value: string) => {
     const numberWithCommasRemoved: string = value.replace(/,/g, "");
     const decimalNumber: number = parseFloat(numberWithCommasRemoved);
@@ -81,10 +114,21 @@ export default function DashboardCreate() {
         mcode: data.mcode,
       }
     );
+
     if (response.status === 200) {
       router.replace("/customer/dashboard", { scroll: true });
     }
   };
+
+  let selectIncometypeOptions: object[] = [];
+  incometypeOption?.filter((item) => {
+    selectIncometypeOptions.push({ label: item.incometype, value: item.id });
+  });
+
+  let selectPercentageOptions: object[] = [];
+  percentageOption?.filter((item) => {
+    selectPercentageOptions.push({ label: item.percentage, value: item.id });
+  });
 
   return (
     <div className="p-14 mx-2">
@@ -103,7 +147,9 @@ export default function DashboardCreate() {
               </p>
               <input
                 type="text"
-                placeholder={errors.docno && errors.docno.message}
+                placeholder={
+                  errors.docno ? errors.docno.message : "กรุณากรอก ภงด."
+                }
                 className={
                   errors.docno
                     ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
@@ -118,7 +164,9 @@ export default function DashboardCreate() {
               </p>
               <input
                 type="text"
-                placeholder={errors.name && errors.name.message}
+                placeholder={
+                  errors.name ? errors.name.message : "กรุณากรอก ชื่อ - นามสกุล"
+                }
                 className={
                   errors.name
                     ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
@@ -133,7 +181,11 @@ export default function DashboardCreate() {
               </p>
               <input
                 type="text"
-                placeholder={errors.idcardno && errors.idcardno.message}
+                placeholder={
+                  errors.idcardno
+                    ? errors.idcardno.message
+                    : "เลขบัตรประชาชนต้องไม่เกิน 13 หลักเท่านั้น"
+                }
                 className={
                   errors.idcardno
                     ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
@@ -154,7 +206,11 @@ export default function DashboardCreate() {
                 }
                 toggleClassName="absolute text-[#000000] ps-3 inset-y-0 start-0 focus:outline-none"
                 i18n={"th"}
-                placeholder={errors.datepaid && errors.datepaid.message}
+                placeholder={
+                  errors.datepaid
+                    ? errors.datepaid.message
+                    : "กรุณากรอก วันที่จ่าย"
+                }
                 primaryColor={"blue"}
                 value={datepaid}
                 onChange={(value: any) => {
@@ -173,30 +229,44 @@ export default function DashboardCreate() {
               <p className="xl:text-base mb-2">
                 ประเภทรายได้ <span className="text-red-500">*</span>
               </p>
-              <input
-                type="text"
-                placeholder={errors.incometype && errors.incometype.message}
-                className={
-                  errors.incometype
-                    ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
-                    : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                }
-                {...register("incometype")}
+              <Select
+                onChange={(value: any) => {
+                  setValue("incometype", value.label);
+                }}
+                options={selectIncometypeOptions}
+                placeholder="กรุณาเลือก ประเภทรายได้"
+                styles={selectStyles}
+                theme={(theme) => ({
+                  ...theme,
+                  borderColor: "#dc2626",
+                  colors: {
+                    ...theme.colors,
+                    primary: "#2563eb",
+                  },
+                })}
+                className="w-full xl:w-11/12 md:h-[40px] text-sm text-gray-700"
               />
             </div>
             <div>
               <p className="xl:text-base mb-2">
                 อัตราร้อยละ <span className="text-red-500">*</span>
               </p>
-              <input
-                type="number"
-                placeholder={errors.percentage && errors.percentage.message}
-                className={
-                  errors.percentage
-                    ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
-                    : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                }
-                {...register("percentage")}
+              <Select
+                onChange={(value: any) => {
+                  setValue("percentage", value.label);
+                }}
+                options={selectPercentageOptions}
+                placeholder="กรุณาเลือก อัตราร้อยละ"
+                styles={selectStyles}
+                theme={(theme) => ({
+                  ...theme,
+                  borderColor: "#dc2626",
+                  colors: {
+                    ...theme.colors,
+                    primary: "#2563eb",
+                  },
+                })}
+                className="w-full xl:w-11/12 md:h-[40px] text-sm text-gray-700"
               />
             </div>
             <div>
@@ -205,7 +275,11 @@ export default function DashboardCreate() {
               </p>
               <input
                 type="text"
-                placeholder={errors.income && errors.income.message}
+                placeholder={
+                  errors.income
+                    ? errors.income.message
+                    : "จำนวนเงินต้องมีจุดทศนิยมไม่เกิน 2 ตำแหน่ง"
+                }
                 className={
                   errors.income
                     ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
@@ -220,7 +294,11 @@ export default function DashboardCreate() {
               </p>
               <input
                 type="text"
-                placeholder={errors.wht && errors.wht.message}
+                placeholder={
+                  errors.wht
+                    ? errors.wht.message
+                    : "จำนวนเงินต้องมีจุดทศนิยมไม่เกิน 2 ตำแหน่ง"
+                }
                 className={
                   errors.wht
                     ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
@@ -240,7 +318,11 @@ export default function DashboardCreate() {
               </p>
               <input
                 type="text"
-                placeholder={errors.mcode && errors.mcode.message}
+                placeholder={
+                  errors.mcode
+                    ? errors.mcode.message
+                    : "กรุณากรอก รหัสนักธุรกิจ"
+                }
                 className={
                   errors.mcode
                     ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
@@ -255,7 +337,11 @@ export default function DashboardCreate() {
                   ที่อยู่ <span className="text-red-500">*</span>
                 </p>
                 <textarea
-                  placeholder={errors.address && errors.address.message}
+                  placeholder={
+                    errors.address
+                      ? errors.address.message
+                      : "กรุณากรอก ที่อยู่"
+                  }
                   className={
                     errors.address
                       ? "w-full xl:w-full md:h-[150px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"

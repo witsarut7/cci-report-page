@@ -3,12 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { pnd } from "@prisma/client";
 import { useEffect, useState } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 import moment from "moment";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { selectStyles } from "@/styles/select-style";
+import Select from "react-select";
+import { pnd, pnd_income_type, pnd_percentage } from "@prisma/client";
 
 export default function DashboardEdit({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -16,6 +18,10 @@ export default function DashboardEdit({ params }: { params: { id: string } }) {
     startDate: null,
     endDate: null,
   });
+  const [incometypeOption, setIncometypeOption] = useState<pnd_income_type[]>();
+  const [percentageOption, setPercentageOption] = useState<pnd_percentage[]>();
+  const [incometype, setIncometype] = useState<string>();
+  const [percentage, setPercentage] = useState<number>();
 
   const schema = Yup.object().shape({
     id: Yup.number(),
@@ -96,6 +102,34 @@ export default function DashboardEdit({ params }: { params: { id: string } }) {
           ),
           endDate: moment(pndData.datepaid, "DD/MM/YYYY").format("YYYY-MM-DD"),
         });
+        setIncometype(pndData.incometype);
+        setPercentage(pndData.percentage);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/income-type`
+      )
+      .then((response) => {
+        const pndIncomeTypeData = response.data
+          .pnd_income_type as pnd_income_type[];
+        setIncometypeOption(pndIncomeTypeData);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/percentage`
+      )
+      .then((response) => {
+        const pndPercentageData = response.data
+          .pnd_percentage as pnd_percentage[];
+        setPercentageOption(pndPercentageData);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -132,6 +166,16 @@ export default function DashboardEdit({ params }: { params: { id: string } }) {
       router.replace("/customer/dashboard", { scroll: true });
     }
   };
+
+  let selectIncometypeOptions: object[] = [];
+  incometypeOption?.filter((item) => {
+    selectIncometypeOptions.push({ label: item.incometype, value: item.id });
+  });
+
+  let selectPercentageOptions: object[] = [];
+  percentageOption?.filter((item) => {
+    selectPercentageOptions.push({ label: item.percentage, value: item.id });
+  });
 
   return (
     <div className="p-14 mx-2">
@@ -220,30 +264,48 @@ export default function DashboardEdit({ params }: { params: { id: string } }) {
               <p className="xl:text-base mb-2">
                 ประเภทรายได้ <span className="text-red-500">*</span>
               </p>
-              <input
-                type="text"
-                placeholder={errors.incometype && errors.incometype.message}
-                className={
-                  errors.incometype
-                    ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
-                    : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                }
-                {...register("incometype")}
+              <Select
+                value={{ label: incometype }}
+                onChange={(value: any) => {
+                  setValue("incometype", value.label);
+                  setIncometype(value.label);
+                }}
+                options={selectIncometypeOptions}
+                placeholder="กรุณาเลือก ประเภทรายได้"
+                styles={selectStyles}
+                theme={(theme) => ({
+                  ...theme,
+                  borderColor: "#dc2626",
+                  colors: {
+                    ...theme.colors,
+                    primary: "#2563eb",
+                  },
+                })}
+                className="w-full xl:w-11/12 md:h-[40px] text-sm text-gray-700"
               />
             </div>
             <div>
               <p className="xl:text-base mb-2">
                 อัตราร้อยละ <span className="text-red-500">*</span>
               </p>
-              <input
-                type="number"
-                placeholder={errors.percentage && errors.percentage.message}
-                className={
-                  errors.percentage
-                    ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
-                    : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                }
-                {...register("percentage")}
+              <Select
+                value={{ label: percentage }}
+                onChange={(value: any) => {
+                  setValue("percentage", value.label);
+                  setPercentage(value.label);
+                }}
+                options={selectPercentageOptions}
+                placeholder="กรุณาเลือก อัตราร้อยละ"
+                styles={selectStyles}
+                theme={(theme) => ({
+                  ...theme,
+                  borderColor: "#dc2626",
+                  colors: {
+                    ...theme.colors,
+                    primary: "#2563eb",
+                  },
+                })}
+                className="w-full xl:w-11/12 md:h-[40px] text-sm text-gray-700"
               />
             </div>
             <div>

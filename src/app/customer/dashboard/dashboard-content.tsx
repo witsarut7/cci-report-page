@@ -154,7 +154,7 @@ export default function DashboardData() {
       { jsonResult }
     );
 
-    if (response.status === 200) {
+    if (response.data.status === 200) {
       toast.success("บันทึกข้อมูลสำเร็จ", {
         position: "top-center",
         autoClose: 5000,
@@ -169,6 +169,18 @@ export default function DashboardData() {
 
       // fetching data after create
       await fetchData();
+    } else if (response.data.status === 404) {
+      toast.error("กรอกข้อมูลไม่ครบ", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Flip,
+      });
     }
   };
 
@@ -488,9 +500,23 @@ export default function DashboardData() {
           </div>
         )}
         <div className="flex justify-between items-center border-light-gray p-4 bg-white border-b dark:border-[#D9D9D9] w-full">
-          <p className="text-sm">
-            showing {data.length} to {limit} of {count} results
-          </p>
+          <div className="hidden flex-row items-center gap-x-2 md:flex">
+            <p className="text-sm">showing {data.length} to</p>
+            <select
+              value={limit}
+              onChange={(value) => {
+                setLimit(Number(value.target.value));
+              }}
+              className="flex h-[30px] border-0 py-0 focus:ring-0 md:border text-sm"
+            >
+              {[10, 20, 30, 40, 50].map((pageSize) => (
+                <option key={pageSize} value={pageSize}>
+                  {pageSize}
+                </option>
+              ))}
+            </select>
+            <p className="text-sm">of {count} results</p>
+          </div>
           <div className="flex gap-4 cursor-default">
             <nav
               className="isolate inline-flex -space-x-px rounded-md shadow-sm"
