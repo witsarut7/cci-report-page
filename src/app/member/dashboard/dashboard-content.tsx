@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { pnd } from "@prisma/client";
-import GeneratePdf from "./generate-pdf";
+import GeneratePdf from "@/shared/generate-pdf";
 import { AiFillFilePdf } from "react-icons/ai";
 import { MdLogout } from "react-icons/md";
 import Image from "next/image";
 import { logout } from "./action";
+import ConfirmModal from "@/shared/confirm-modal";
 
 export default function DashboardData(userData: {
   mType: number;
@@ -19,6 +20,8 @@ export default function DashboardData(userData: {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [mcode, setMcode] = useState(userData.mcode);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
 
   useEffect(() => {
     axios
@@ -32,6 +35,7 @@ export default function DashboardData(userData: {
         setData(response.data.pnd);
         setPageCount(response.data.pageCount);
         setCount(response.data.count);
+        setSelectedItems([]);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -55,6 +59,50 @@ export default function DashboardData(userData: {
     return false;
   };
 
+  const handleMultiExportPdf = async () => {
+    const response = await axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/member/api/dashboard/export-pdf`,
+        {
+          params: { ids: selectedItems.join(",") },
+        }
+      )
+      .then((res) => {
+        return res.data.pnd as pnd[];
+      })
+      .catch((error) => {
+        throw error;
+      });
+
+    if (response) {
+      for (const item of response) {
+        GeneratePdf(item, userData.mType, "Download");
+      }
+    }
+
+    setSelectedItems([]);
+  };
+
+  const handleCheckboxChange = (id: number) => {
+    const selectedIndex = selectedItems.indexOf(id);
+    if (selectedIndex === -1) {
+      setSelectedItems([...selectedItems, id]);
+    } else {
+      const newSelectedItems = [...selectedItems];
+      newSelectedItems.splice(selectedIndex, 1);
+      setSelectedItems(newSelectedItems);
+    }
+  };
+
+  const handleMultiCheckboxChange = (data: pnd[]) => {
+    const ids = data.map((item) => item.id);
+    if (selectedItems.length === data.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(ids);
+    }
+  };
+
   return (
     <div className="p-14 mx-2">
       {/* header */}
@@ -66,6 +114,22 @@ export default function DashboardData(userData: {
         </div>
       </div>
 
+      <div className="flex gap-5 mb-4">
+        <div className="flex h-[40px] justify-center items-center">
+          <p className="md:text-base">
+            เลือกแล้ว {selectedItems.length} รายการ
+          </p>
+        </div>
+        <button
+          onClick={() => setOpenConfirmModal(true)}
+          className={`md:text-base md:w-[114px] md:h-[40px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+            selectedItems.length === 0 && "invisible"
+          }`}
+        >
+          Export PDF
+        </button>
+      </div>
+
       {/* table */}
       <div className="flex justify-center items-center">
         <div className="flex flex-col bg-white overflow-hidden">
@@ -73,6 +137,16 @@ export default function DashboardData(userData: {
             <table className="w-full min-w-[1024px] table-fixed divide-y divide-ctLightGray border-b border-b-ctLightGray">
               <thead className="text-base bg-[#CDD8FF]">
                 <tr>
+                  <th className="px-5 py-4 text-left text-sm w-[16px] min-w-[16px]">
+                    <input
+                      type="checkbox"
+                      onChange={() => handleMultiCheckboxChange(data)}
+                      checked={
+                        selectedItems.length === data.length &&
+                        selectedItems.length !== 0
+                      }
+                    />
+                  </th>
                   <th className="px-5 py-4 text-left text-sm w-[112px] min-w-[112px]">
                     ภงด.
                   </th>
@@ -85,19 +159,22 @@ export default function DashboardData(userData: {
                   <th className="px-5 py-4 text-left text-sm w-[132px] min-w-[132px]">
                     เลขบัตรประชาชน
                   </th>
+                  <th className="px-5 py-4 text-left text-sm w-[102px] min-w-[102px]">
+                    รหัสนักธุรกิจ
+                  </th>
                   <th className="px-5 py-4 text-left text-sm w-[92px] min-w-[92px]">
                     วันที่จ่าย
                   </th>
                   <th className="px-5 py-4 text-left text-sm w-[91px] min-w-[91px]">
                     ประเภทรายได้
                   </th>
-                  <th className="px-5 py-4 text-left text-sm w-[79px] min-w-[79px]">
+                  <th className="px-5 py-4 text-left text-sm w-[81px] min-w-[81px]">
                     อัตราร้อยละ
                   </th>
-                  <th className="px-5 py-4 text-left text-sm w-[79px] min-w-[85px]">
+                  <th className="px-5 py-4 text-left text-sm w-[85px] min-w-[85px]">
                     จำนวนเงินได้
                   </th>
-                  <th className="px-5 py-4 text-left text-sm w-[108px] min-w-[108px]">
+                  <th className="px-5 py-4 text-left text-sm w-[100px] min-w-[100px]">
                     ภาษีหัก ณ ที่จ่าย
                   </th>
                   <th className="px-5 py-4 text-left text-sm w-[55px] min-w-[55px]"></th>
@@ -111,6 +188,13 @@ export default function DashboardData(userData: {
                       className="bg-white border-b dark:border-[#D9D9D9]"
                     >
                       <td className="px-5 py-4 text-left text-sm">
+                        <input
+                          type="checkbox"
+                          onChange={() => handleCheckboxChange(item.id)}
+                          checked={selectedItems.includes(item.id)}
+                        />
+                      </td>
+                      <td className="px-5 py-4 text-left text-sm">
                         {item.docno ? item.docno : "-"}
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
@@ -121,6 +205,9 @@ export default function DashboardData(userData: {
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
                         {item.idcardno ? item.idcardno : "-"}
+                      </td>
+                      <td className="px-5 py-4 text-left text-sm">
+                        {item.mcode ? item.mcode : "-"}
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
                         {item.datepaid ? item.datepaid : "-"}
@@ -149,7 +236,7 @@ export default function DashboardData(userData: {
                         <button
                           type="button"
                           onClick={() => {
-                            GeneratePdf(item, userData.mType);
+                            GeneratePdf(item, userData.mType, "Preview");
                           }}
                         >
                           <AiFillFilePdf className="h-6 w-6 text-[#D03232]" />
@@ -307,6 +394,14 @@ export default function DashboardData(userData: {
           </div>
         )}
       </div>
+      <ConfirmModal
+        show={openConfirmModal}
+        onHide={() => setOpenConfirmModal(false)}
+        style="h-10 w-full rounded-5 bg-blue-600 text-white disabled:opacity-75 xs:w-ct120 md:h-ct50 md:text-base"
+        text={`ยืนยันการ Export PDF ${selectedItems.length} รายการ`}
+        subText=""
+        callback={handleMultiExportPdf}
+      />
     </div>
   );
 }

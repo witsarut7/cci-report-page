@@ -139,216 +139,220 @@ export default function DashboardCreate() {
 
       {/* body */}
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="mb-6 grid md:grid-rows-2 gap-5">
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-5">
-            <div>
-              <p className="xl:text-base mb-2">
-                ภงด. <span className="text-red-500">*</span>
-              </p>
-              <input
-                type="text"
-                placeholder={
-                  errors.docno ? errors.docno.message : "กรุณากรอก ภงด."
-                }
-                className={
-                  errors.docno
-                    ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
-                    : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                }
-                {...register("docno")}
-              />
-            </div>
-            <div>
-              <p className="xl:text-base mb-2">
-                ชื่อ - นามสกุล <span className="text-red-500">*</span>
-              </p>
-              <input
-                type="text"
-                placeholder={
-                  errors.name ? errors.name.message : "กรุณากรอก ชื่อ - นามสกุล"
-                }
-                className={
-                  errors.name
-                    ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
-                    : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                }
-                {...register("name")}
-              />
-            </div>
-            <div>
-              <p className="xl:text-base mb-2">
-                เลขบัตรประชาชน <span className="text-red-500">*</span>
-              </p>
-              <input
-                type="text"
-                placeholder={
-                  errors.idcardno
-                    ? errors.idcardno.message
-                    : "เลขบัตรประชาชนต้องไม่เกิน 13 หลักเท่านั้น"
-                }
-                className={
-                  errors.idcardno
-                    ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
-                    : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                }
-                {...register("idcardno")}
-              />
-            </div>
-            <div className="relative">
-              <p className="xl:text-base mb-2">
-                วันที่จ่าย <span className="text-red-500">*</span>
-              </p>
-              <Datepicker
-                inputClassName={
-                  errors.datepaid
-                    ? "w-full xl:w-11/12 md:h-[40px] block p-4 ps-10 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
-                    : "w-full xl:w-11/12 md:h-[40px] block p-4 ps-10 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                }
-                toggleClassName="absolute text-[#000000] ps-3 inset-y-0 start-0 focus:outline-none"
-                i18n={"th"}
-                placeholder={
-                  errors.datepaid
-                    ? errors.datepaid.message
-                    : "กรุณากรอก วันที่จ่าย"
-                }
-                primaryColor={"blue"}
-                value={datepaid}
-                onChange={(value: any) => {
-                  setDatepaid(value);
-                  setValue("datepaid", value.startDate);
-                }}
-                displayFormat={"DD/MM/YYYY"}
-                startWeekOn="mon"
-                useRange={false}
-                asSingle={true}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-5">
-            <div>
-              <p className="xl:text-base mb-2">
-                ประเภทรายได้ <span className="text-red-500">*</span>
-              </p>
-              <Select
-                onChange={(value: any) => {
-                  setValue("incometype", value.label);
-                }}
-                options={selectIncometypeOptions}
-                placeholder="กรุณาเลือก ประเภทรายได้"
-                styles={selectStyles}
-                theme={(theme) => ({
-                  ...theme,
-                  borderColor: "#dc2626",
-                  colors: {
-                    ...theme.colors,
-                    primary: "#2563eb",
-                  },
-                })}
-                className="w-full xl:w-11/12 md:h-[40px] text-sm text-gray-700"
-              />
-            </div>
-            <div>
-              <p className="xl:text-base mb-2">
-                อัตราร้อยละ <span className="text-red-500">*</span>
-              </p>
-              <Select
-                onChange={(value: any) => {
-                  setValue("percentage", value.label);
-                }}
-                options={selectPercentageOptions}
-                placeholder="กรุณาเลือก อัตราร้อยละ"
-                styles={selectStyles}
-                theme={(theme) => ({
-                  ...theme,
-                  borderColor: "#dc2626",
-                  colors: {
-                    ...theme.colors,
-                    primary: "#2563eb",
-                  },
-                })}
-                className="w-full xl:w-11/12 md:h-[40px] text-sm text-gray-700"
-              />
-            </div>
-            <div>
-              <p className="xl:text-base mb-2">
-                จำนวนเงินได้ <span className="text-red-500">*</span>
-              </p>
-              <input
-                type="text"
-                placeholder={
-                  errors.income
-                    ? errors.income.message
-                    : "จำนวนเงินต้องมีจุดทศนิยมไม่เกิน 2 ตำแหน่ง"
-                }
-                className={
-                  errors.income
-                    ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
-                    : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                }
-                {...register("income")}
-              />
-            </div>
-            <div>
-              <p className="xl:text-base mb-2">
-                ภาษีหัก ณ ที่จ่าย <span className="text-red-500">*</span>
-              </p>
-              <input
-                type="text"
-                placeholder={
-                  errors.wht
-                    ? errors.wht.message
-                    : "จำนวนเงินต้องมีจุดทศนิยมไม่เกิน 2 ตำแหน่ง"
-                }
-                className={
-                  errors.wht
-                    ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
-                    : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                }
-                {...register("wht")}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-4 grid md:grid-rows-1 gap-5">
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-5">
-            <div>
-              <p className="xl:text-base mb-2">
-                รหัสนักธุรกิจ <span className="text-red-500">*</span>
-              </p>
-              <input
-                type="text"
-                placeholder={
-                  errors.mcode
-                    ? errors.mcode.message
-                    : "กรุณากรอก รหัสนักธุรกิจ"
-                }
-                className={
-                  errors.mcode
-                    ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
-                    : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                }
-                {...register("mcode")}
-              />
-            </div>
-            <div className="grid grid-cols-1 xl:grid-cols-1 gap-5">
+        <div className="bg-[#CDD8FF] p-4 rounded-md mb-4">
+          <div className="mb-6 grid md:grid-rows-2 gap-5">
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-5">
               <div>
                 <p className="xl:text-base mb-2">
-                  ที่อยู่ <span className="text-red-500">*</span>
+                  ภงด. <span className="text-red-500">*</span>
                 </p>
-                <textarea
+                <input
+                  type="text"
                   placeholder={
-                    errors.address
-                      ? errors.address.message
-                      : "กรุณากรอก ที่อยู่"
+                    errors.docno ? errors.docno.message : "กรุณากรอก ภงด."
                   }
                   className={
-                    errors.address
-                      ? "w-full xl:w-full md:h-[150px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
-                      : "w-full xl:w-full md:h-[150px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    errors.docno
+                      ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
+                      : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
                   }
-                  {...register("address")}
+                  {...register("docno")}
                 />
+              </div>
+              <div>
+                <p className="xl:text-base mb-2">
+                  ชื่อ - นามสกุล <span className="text-red-500">*</span>
+                </p>
+                <input
+                  type="text"
+                  placeholder={
+                    errors.name
+                      ? errors.name.message
+                      : "กรุณากรอก ชื่อ - นามสกุล"
+                  }
+                  className={
+                    errors.name
+                      ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
+                      : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  }
+                  {...register("name")}
+                />
+              </div>
+              <div>
+                <p className="xl:text-base mb-2">
+                  เลขบัตรประชาชน <span className="text-red-500">*</span>
+                </p>
+                <input
+                  type="text"
+                  placeholder={
+                    errors.idcardno
+                      ? errors.idcardno.message
+                      : "เลขบัตรประชาชนต้องไม่เกิน 13 หลักเท่านั้น"
+                  }
+                  className={
+                    errors.idcardno
+                      ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
+                      : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  }
+                  {...register("idcardno")}
+                />
+              </div>
+              <div className="relative">
+                <p className="xl:text-base mb-2">
+                  วันที่จ่าย <span className="text-red-500">*</span>
+                </p>
+                <Datepicker
+                  inputClassName={
+                    errors.datepaid
+                      ? "w-full xl:w-11/12 md:h-[40px] block p-4 ps-10 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
+                      : "w-full xl:w-11/12 md:h-[40px] block p-4 ps-10 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  }
+                  toggleClassName="absolute text-[#000000] ps-3 inset-y-0 start-0 focus:outline-none"
+                  i18n={"th"}
+                  placeholder={
+                    errors.datepaid
+                      ? errors.datepaid.message
+                      : "กรุณากรอก วันที่จ่าย"
+                  }
+                  primaryColor={"blue"}
+                  value={datepaid}
+                  onChange={(value: any) => {
+                    setDatepaid(value);
+                    setValue("datepaid", value.startDate);
+                  }}
+                  displayFormat={"DD/MM/YYYY"}
+                  startWeekOn="mon"
+                  useRange={false}
+                  asSingle={true}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-5">
+              <div>
+                <p className="xl:text-base mb-2">
+                  ประเภทรายได้ <span className="text-red-500">*</span>
+                </p>
+                <Select
+                  onChange={(value: any) => {
+                    setValue("incometype", value.label);
+                  }}
+                  options={selectIncometypeOptions}
+                  placeholder="กรุณาเลือก ประเภทรายได้"
+                  styles={selectStyles}
+                  theme={(theme) => ({
+                    ...theme,
+                    borderColor: "#dc2626",
+                    colors: {
+                      ...theme.colors,
+                      primary: "#2563eb",
+                    },
+                  })}
+                  className="w-full xl:w-11/12 md:h-[40px] text-sm text-gray-700"
+                />
+              </div>
+              <div>
+                <p className="xl:text-base mb-2">
+                  อัตราร้อยละ <span className="text-red-500">*</span>
+                </p>
+                <Select
+                  onChange={(value: any) => {
+                    setValue("percentage", value.label);
+                  }}
+                  options={selectPercentageOptions}
+                  placeholder="กรุณาเลือก อัตราร้อยละ"
+                  styles={selectStyles}
+                  theme={(theme) => ({
+                    ...theme,
+                    borderColor: "#dc2626",
+                    colors: {
+                      ...theme.colors,
+                      primary: "#2563eb",
+                    },
+                  })}
+                  className="w-full xl:w-11/12 md:h-[40px] text-sm text-gray-700"
+                />
+              </div>
+              <div>
+                <p className="xl:text-base mb-2">
+                  จำนวนเงินได้ <span className="text-red-500">*</span>
+                </p>
+                <input
+                  type="text"
+                  placeholder={
+                    errors.income
+                      ? errors.income.message
+                      : "จำนวนเงินต้องมีจุดทศนิยมไม่เกิน 2 ตำแหน่ง"
+                  }
+                  className={
+                    errors.income
+                      ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
+                      : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  }
+                  {...register("income")}
+                />
+              </div>
+              <div>
+                <p className="xl:text-base mb-2">
+                  ภาษีหัก ณ ที่จ่าย <span className="text-red-500">*</span>
+                </p>
+                <input
+                  type="text"
+                  placeholder={
+                    errors.wht
+                      ? errors.wht.message
+                      : "จำนวนเงินต้องมีจุดทศนิยมไม่เกิน 2 ตำแหน่ง"
+                  }
+                  className={
+                    errors.wht
+                      ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
+                      : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  }
+                  {...register("wht")}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-4 grid md:grid-rows-1 gap-5">
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-5">
+              <div>
+                <p className="xl:text-base mb-2">
+                  รหัสนักธุรกิจ <span className="text-red-500">*</span>
+                </p>
+                <input
+                  type="text"
+                  placeholder={
+                    errors.mcode
+                      ? errors.mcode.message
+                      : "กรุณากรอก รหัสนักธุรกิจ"
+                  }
+                  className={
+                    errors.mcode
+                      ? "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
+                      : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  }
+                  {...register("mcode")}
+                />
+              </div>
+              <div className="grid grid-cols-1 xl:grid-cols-1 gap-5">
+                <div>
+                  <p className="xl:text-base mb-2">
+                    ที่อยู่ <span className="text-red-500">*</span>
+                  </p>
+                  <textarea
+                    placeholder={
+                      errors.address
+                        ? errors.address.message
+                        : "กรุณากรอก ที่อยู่"
+                    }
+                    className={
+                      errors.address
+                        ? "w-full xl:w-full md:h-[150px] block p-4 text-sm text-gray-700 bg-white border-2 border-red-600 rounded-md focus:outline-none focus:ring-red-600"
+                        : "w-full xl:w-full md:h-[150px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    }
+                    {...register("address")}
+                  />
+                </div>
               </div>
             </div>
           </div>

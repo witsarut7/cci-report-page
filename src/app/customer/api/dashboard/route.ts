@@ -51,6 +51,8 @@ export async function GET(req: NextRequest) {
           search || ""
         }, '%') OR name LIKE CONCAT('%', ${
           search || ""
+        }, '%') OR mcode LIKE CONCAT('%', ${
+          search || ""
         }, '%')) ORDER BY id DESC LIMIT ${Number(limit)} OFFSET ${offset}`
       )) as pnd[];
 
@@ -58,7 +60,9 @@ export async function GET(req: NextRequest) {
       const count = (await prisma.$queryRaw(
         Prisma.sql`SELECT * FROM pnd WHERE STR_TO_DATE(datepaid, '%d/%m/%Y') >= ${startDate} AND STR_TO_DATE(datepaid, '%d/%m/%Y') <= ${endDate} AND (idcardno LIKE CONCAT('%', ${
           search || ""
-        }, '%') OR name LIKE CONCAT('%', ${search || ""}, '%'))`
+        }, '%') OR name LIKE CONCAT('%', ${
+          search || ""
+        }, '%') OR mcode LIKE CONCAT('%', ${search || ""}, '%'))`
       )) as pnd[];
 
       const dataCount = count.length;
@@ -75,6 +79,8 @@ export async function GET(req: NextRequest) {
           search || ""
         }, '%') OR name LIKE CONCAT('%', ${
           search || ""
+        }, '%') OR mcode LIKE CONCAT('%', ${
+          search || ""
         }, '%') ORDER BY id DESC LIMIT ${Number(limit)} OFFSET ${offset}`
       )) as pnd[];
 
@@ -82,7 +88,9 @@ export async function GET(req: NextRequest) {
       const count = (await prisma.$queryRaw(
         Prisma.sql`SELECT * FROM pnd WHERE idcardno LIKE CONCAT('%', ${
           search || ""
-        }, '%') OR name LIKE CONCAT('%', ${search || ""}, '%')`
+        }, '%') OR name LIKE CONCAT('%', ${
+          search || ""
+        }, '%') OR mcode LIKE CONCAT('%', ${search || ""}, '%')`
       )) as pnd[];
 
       const dataCount = count.length;

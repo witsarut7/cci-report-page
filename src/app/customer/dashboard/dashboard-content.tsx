@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { pnd } from "@prisma/client";
-import { AiOutlineEdit } from "react-icons/ai";
+import { ali_member, pnd } from "@prisma/client";
+import { AiFillFilePdf, AiOutlineEdit } from "react-icons/ai";
 import { AiOutlineSearch } from "react-icons/ai";
 import { MdLogout } from "react-icons/md";
 import Image from "next/image";
@@ -13,6 +13,8 @@ import { useRouter } from "next/navigation";
 import * as XLSX from "xlsx";
 import { Flip, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import GeneratePdf from "@/shared/generate-pdf";
+import ConfirmModal from "@/shared/confirm-modal";
 
 export default function DashboardData() {
   const router = useRouter();
@@ -29,6 +31,9 @@ export default function DashboardData() {
   const [file, setFile] = useState<any>({});
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [jsonResult, setJsonResult] = useState<Array<JsonObject>>([]);
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState(false);
+  const [exportPdfConfirmModal, setExportPdfConfirmModal] = useState(false);
+
   interface JsonObject {
     [key: string]: string;
   }
@@ -243,6 +248,90 @@ export default function DashboardData() {
     }
   };
 
+  const handleExportPdf = async (data: pnd, mcode: string) => {
+    const response = await axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/member`,
+        {
+          params: { mcode: mcode },
+        }
+      )
+      .then((res) => {
+        return res.data.member as ali_member;
+      })
+      .catch((error) => {
+        throw error;
+      });
+
+    if (response) {
+      GeneratePdf(data, response.mtype, "Preview");
+    } else {
+      return toast.error(`รหัสนักธุรกิจ ${mcode} ไม่ถูกต้อง`, {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Flip,
+      });
+    }
+  };
+
+  const handleMultiExportPdf = async () => {
+    const response = await axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/member/api/dashboard/export-pdf`,
+        {
+          params: { ids: selectedItems.join(",") },
+        }
+      )
+      .then((res) => {
+        return res.data.pnd as pnd[];
+      })
+      .catch((error) => {
+        throw error;
+      });
+
+    if (response) {
+      for (const item of response) {
+        const findMember = await axios
+          .get(
+            `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/member`,
+            {
+              params: { mcode: item.mcode },
+            }
+          )
+          .then((res) => {
+            return res.data.member as ali_member;
+          })
+          .catch((error) => {
+            throw error;
+          });
+
+        if (findMember) {
+          GeneratePdf(item, findMember.mtype, "Download");
+        } else {
+          return toast.error(`รหัสนักธุรกิจ ${item.mcode} ไม่ถูกต้อง`, {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Flip,
+          });
+        }
+      }
+    }
+
+    setSelectedItems([]);
+  };
+
   return (
     <div className="p-14 mx-2">
       <ToastContainer stacked />
@@ -258,16 +347,26 @@ export default function DashboardData() {
 
       <div className="mb-4 justify-between items-start flex-row flex">
         <div className="flex gap-5">
-          <p className="md:text-base">
-            เลือกแล้ว {selectedItems.length} รายการ
-          </p>
+          <div className="flex h-[40px] justify-center items-center">
+            <p className="md:text-base">
+              เลือกแล้ว {selectedItems.length} รายการ
+            </p>
+          </div>
           <button
-            onClick={handleMultiDelete}
+            onClick={() => setDeleteConfirmModal(true)}
             className={`text-[#D03232] md:text-base ${
               selectedItems.length === 0 && "invisible"
             }`}
           >
             ลบรายการ
+          </button>
+          <button
+            onClick={() => setExportPdfConfirmModal(true)}
+            className={`md:text-base md:w-[114px] md:h-[40px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+              selectedItems.length === 0 && "invisible"
+            }`}
+          >
+            Export PDF
           </button>
         </div>
 
@@ -382,7 +481,7 @@ export default function DashboardData() {
                       }
                     />
                   </th>
-                  <th className="px-5 py-4 text-left text-sm w-[112px] min-w-[112px]">
+                  <th className="px-5 py-4 text-left text-sm w-[90px] min-w-[90px]">
                     ภงด.
                   </th>
                   <th className="px-5 py-4 text-left text-sm w-[160px] min-w-[160px]">
@@ -391,25 +490,29 @@ export default function DashboardData() {
                   <th className="px-5 py-4 text-left text-sm w-[160px] min-w-[160px]">
                     ที่อยู่
                   </th>
-                  <th className="px-5 py-4 text-left text-sm w-[132px] min-w-[132px]">
+                  <th className="px-5 py-4 text-left text-sm w-[112px] min-w-[112px]">
                     เลขบัตรประชาชน
+                  </th>
+                  <th className="px-5 py-4 text-left text-sm w-[100px] min-w-[100px]">
+                    รหัสนักธุรกิจ
                   </th>
                   <th className="px-5 py-4 text-left text-sm w-[92px] min-w-[92px]">
                     วันที่จ่าย
                   </th>
-                  <th className="px-5 py-4 text-left text-sm w-[91px] min-w-[91px]">
+                  <th className="px-5 py-4 text-left text-sm w-[95px] min-w-[95px]">
                     ประเภทรายได้
                   </th>
-                  <th className="px-5 py-4 text-left text-sm w-[79px] min-w-[79px]">
+                  <th className="px-5 py-4 text-left text-sm w-[81px] min-w-[81px]">
                     อัตราร้อยละ
                   </th>
-                  <th className="px-5 py-4 text-left text-sm w-[79px] min-w-[85px]">
+                  <th className="px-5 py-4 text-left text-sm w-[85px] min-w-[85px]">
                     จำนวนเงินได้
                   </th>
-                  <th className="px-5 py-4 text-left text-sm w-[108px] min-w-[108px]">
+                  <th className="px-5 py-4 text-left text-sm w-[100px] min-w-[100px]">
                     ภาษีหัก ณ ที่จ่าย
                   </th>
-                  <th className="px-5 py-4 text-left text-sm w-[55px] min-w-[55px]"></th>
+                  <th className="px-5 py-4 text-left text-sm w-[27px] min-w-[27px]"></th>
+                  <th className="px-5 py-4 text-left text-sm w-[27px] min-w-[27px]"></th>
                 </tr>
               </thead>
               <tbody>
@@ -439,6 +542,9 @@ export default function DashboardData() {
                         {item.idcardno ? item.idcardno : "-"}
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
+                        {item.mcode ? item.mcode : "-"}
+                      </td>
+                      <td className="px-5 py-4 text-left text-sm">
                         {item.datepaid ? item.datepaid : "-"}
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
@@ -460,6 +566,16 @@ export default function DashboardData() {
                               minimumFractionDigits: 2,
                             }).format(Number(item?.wht))
                           : "-"}
+                      </td>
+                      <td className="px-5 py-4 text-left text-sm">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleExportPdf(item, item.mcode);
+                          }}
+                        >
+                          <AiFillFilePdf className="h-6 w-6 text-[#D03232]" />
+                        </button>
                       </td>
                       <td className="px-5 py-4 text-left text-sm">
                         <button
@@ -622,6 +738,27 @@ export default function DashboardData() {
           </div>
         </div>
       </div>
+      <ConfirmModal
+        show={deleteConfirmModal || exportPdfConfirmModal}
+        onHide={() => {
+          setDeleteConfirmModal(false), setExportPdfConfirmModal(false);
+        }}
+        style={`${
+          (deleteConfirmModal && "bg-red-600") ||
+          (exportPdfConfirmModal && "bg-blue-600")
+        } "h-10 w-full rounded-5 text-white disabled:opacity-75 xs:w-ct120 md:h-ct50 md:text-base"`}
+        text={`${
+          (deleteConfirmModal &&
+            `ยืนยันการลบ ${selectedItems.length} รายการ`) ||
+          (exportPdfConfirmModal &&
+            `ยืนยันการ Export PDF ${selectedItems.length} รายการ`)
+        }`}
+        subText=""
+        callback={
+          (deleteConfirmModal && handleMultiDelete) ||
+          (exportPdfConfirmModal && handleMultiExportPdf)
+        }
+      />
     </div>
   );
 }
