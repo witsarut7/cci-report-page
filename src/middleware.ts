@@ -127,9 +127,7 @@ export async function middleware(request: NextRequest) {
       !tokenBackOffice &&
       request.nextUrl.pathname.startsWith("/customer/dashboard")
     ) {
-      return NextResponse.redirect(
-        new URL(`${process.env.ENDPOINT_REDIRECT}`, request.url)
-      );
+      return NextResponse.redirect(new URL("/customer/login", request.url));
     }
   } catch (error) {
     return NextResponse.redirect(
