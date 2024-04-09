@@ -27,7 +27,7 @@ export default function LoginContent(userData: { mcode: string }) {
     const result = await login(idCard, userData.mcode);
     if (result === null) {
       toast.error("ID Card ไม่ถูกต้อง", {
-        position: "top-left",
+        position: "top-center",
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,

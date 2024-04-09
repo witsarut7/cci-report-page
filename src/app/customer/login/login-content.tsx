@@ -30,7 +30,7 @@ export default function LoginContent() {
     const result = await login(email, password);
     if (result?.status === 401) {
       toast.error(`${result.message}`, {
-        position: "top-left",
+        position: "top-center",
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,

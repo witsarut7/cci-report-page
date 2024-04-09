@@ -47,6 +47,16 @@ export default function GeneratePdf(
     "ค่าบริการ",
     "ค่าเบี้ยประกันวินาศภัย",
   ];
+
+  let checkIncomeOtherType = false;
+  if (
+    !checkIncomeType1.includes(data?.incometype) &&
+    !checkIncomeType2.includes(data?.incometype) &&
+    !checkIncomeType5.includes(data?.incometype)
+  ) {
+    checkIncomeOtherType = true;
+  }
+
   const docDefinition: TDocumentDefinitions = {
     info: {
       title: `${data.docno}-${data.name}.pdf`,
@@ -837,19 +847,21 @@ export default function GeneratePdf(
               },
               {
                 border: [true, false, false, false],
-                text: "",
+                text: `${checkIncomeOtherType ? data?.datepaid : ""}`,
                 alignment: "center",
                 fontSize: 11,
               },
               {
                 border: [true, false, false, false],
-                text: "",
+                text: `${
+                  checkIncomeOtherType ? NumZeroFormat(data?.income) : ""
+                }`,
                 alignment: "right",
                 fontSize: 11,
               },
               {
                 border: [true, false, true, false],
-                text: "",
+                text: `${checkIncomeOtherType ? NumZeroFormat(data?.wht) : ""}`,
                 alignment: "right",
                 fontSize: 11,
               },
@@ -967,7 +979,8 @@ export default function GeneratePdf(
       },
       {
         text: `${
-          checkIncomeType5.includes(data?.incometype) ? data?.incometype : ""
+          (checkIncomeType5.includes(data?.incometype) && data?.incometype) ||
+          (checkIncomeOtherType ? data?.incometype : "")
         }`,
         fontSize: 11,
         absolutePosition: { x: 140, y: 555 },
