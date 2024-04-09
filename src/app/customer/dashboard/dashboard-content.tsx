@@ -362,7 +362,7 @@ export default function DashboardData() {
           </button>
           <button
             onClick={() => setExportPdfConfirmModal(true)}
-            className={`md:text-base md:w-[114px] md:h-[40px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+            className={`md:text-base md:w-[125px] md:h-[40px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
               selectedItems.length === 0 && "invisible"
             }`}
           >

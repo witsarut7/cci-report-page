@@ -152,7 +152,22 @@ export default function DashboardCreate() {
 
   let selectPayoutTaxOptions: object[] = [];
   payoutTaxOption?.filter((item) => {
-    selectPayoutTaxOptions.push({ label: item.payouttax, value: item.id });
+    if (item.payouttax === 1) {
+      selectPayoutTaxOptions.push({
+        label: "หักภาษี ณ ที่จ่าย",
+        value: item.payouttax,
+      });
+    } else if (item.payouttax === 2) {
+      selectPayoutTaxOptions.push({
+        label: "ออกภาษีให้ตลอดไป",
+        value: item.payouttax,
+      });
+    } else if (item.payouttax === 3) {
+      selectPayoutTaxOptions.push({
+        label: "ออกภาษีให้ครั้งเดียว",
+        value: item.payouttax,
+      });
+    }
   });
 
   return (
@@ -365,7 +380,7 @@ export default function DashboardCreate() {
                 </p>
                 <Select
                   onChange={(value: any) => {
-                    setValue("payouttax", value.label);
+                    setValue("payouttax", value.value);
                   }}
                   options={selectPayoutTaxOptions}
                   placeholder="กรุณาเลือก ประเภทผู้จ่าย"

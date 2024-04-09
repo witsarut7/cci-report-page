@@ -34,7 +34,19 @@ export default function GeneratePdf(
   mType: number,
   generateType: string
 ) {
-  const checkIncomeType = ["ส่งเสริมการขาย", "รางวัล"];
+  const checkIncomeType1 = ["เงินเดือน", "ค่าจ้าง", "เบี้ยเลี้ยง", "โบนัส"];
+  const checkIncomeType2 = ["ค่าธรรมเนียม", "ค่านายหน้า", "ที่ปรึกษา"];
+  const checkIncomeType5 = [
+    "รางวัล",
+    "ส่งเสริมการขาย",
+    "ค่าแสดงของนักแสดง",
+    "ค่าจ้างทำของ",
+    "ค่าโฆษณา",
+    "ค่าเช่า",
+    "ค่าขนส่ง",
+    "ค่าบริการ",
+    "ค่าเบี้ยประกันวินาศภัย",
+  ];
   const docDefinition: TDocumentDefinitions = {
     info: {
       title: `${data.docno}-${data.name}.pdf`,
@@ -380,33 +392,19 @@ export default function GeneratePdf(
         width: 7,
         absolutePosition: { x: 406, y: 177.5 },
       },
-      mType === 1
-        ? {
-            image: "checked",
-            height: 7,
-            width: 7,
-            absolutePosition: { x: 406, y: 191.9 },
-          }
-        : {
-            image: "unchecked",
-            height: 7,
-            width: 7,
-            absolutePosition: { x: 406, y: 191.9 },
-          },
+      {
+        image: `${mType === 1 ? "checked" : "unchecked"}`,
+        height: 7,
+        width: 7,
+        absolutePosition: { x: 406, y: 191.9 },
+      },
       // checkbox (4)
-      mType !== 1
-        ? {
-            image: "checked",
-            height: 7,
-            width: 7,
-            absolutePosition: { x: 495, y: 177.5 },
-          }
-        : {
-            image: "unchecked",
-            height: 7,
-            width: 7,
-            absolutePosition: { x: 495, y: 177.5 },
-          },
+      {
+        image: `${mType !== 1 ? "checked" : "unchecked"}`,
+        height: 7,
+        width: 7,
+        absolutePosition: { x: 495, y: 177.5 },
+      },
       {
         table: {
           widths: ["*", 55, 75, 75],
@@ -449,21 +447,33 @@ export default function GeneratePdf(
               },
               {
                 border: [true, false, false, false],
-                text: "",
+                text: `${
+                  checkIncomeType1.includes(data?.incometype)
+                    ? data?.datepaid
+                    : ""
+                }`,
                 alignment: "center",
                 fontSize: 11,
                 margin: [0, 7, 0, 0],
               },
               {
                 border: [true, false, false, false],
-                text: "",
+                text: `${
+                  checkIncomeType1.includes(data?.incometype)
+                    ? NumZeroFormat(data?.income)
+                    : ""
+                }`,
                 alignment: "right",
                 fontSize: 11,
                 margin: [0, 7, 0, 0],
               },
               {
                 border: [true, false, true, false],
-                text: "",
+                text: `${
+                  checkIncomeType1.includes(data?.incometype)
+                    ? NumZeroFormat(data?.wht)
+                    : ""
+                }`,
                 alignment: "right",
                 fontSize: 11,
                 margin: [0, 7, 0, 0],
@@ -477,45 +487,36 @@ export default function GeneratePdf(
                 fontSize: 11,
                 margin: [30, 0, 0, 0],
               },
-              data.incometype === "ค่านายหน้า"
-                ? {
-                    border: [true, false, false, false],
-                    text: `${data?.datepaid}`,
-                    alignment: "center",
-                    fontSize: 11,
-                  }
-                : {
-                    border: [true, false, false, false],
-                    text: "",
-                    alignment: "center",
-                    fontSize: 11,
-                  },
-              data.incometype === "ค่านายหน้า"
-                ? {
-                    border: [true, false, false, false],
-                    text: `${NumZeroFormat(data?.income)}`,
-                    alignment: "right",
-                    fontSize: 11,
-                  }
-                : {
-                    border: [true, false, false, false],
-                    text: "",
-                    alignment: "right",
-                    fontSize: 11,
-                  },
-              data.incometype === "ค่านายหน้า"
-                ? {
-                    border: [true, false, true, false],
-                    text: `${NumZeroFormat(data?.wht)}`,
-                    alignment: "right",
-                    fontSize: 11,
-                  }
-                : {
-                    border: [true, false, true, false],
-                    text: "",
-                    alignment: "right",
-                    fontSize: 11,
-                  },
+              {
+                border: [true, false, false, false],
+                text: `${
+                  checkIncomeType2.includes(data?.incometype)
+                    ? data?.datepaid
+                    : ""
+                }`,
+                alignment: "center",
+                fontSize: 11,
+              },
+              {
+                border: [true, false, false, false],
+                text: `${
+                  checkIncomeType2.includes(data?.incometype)
+                    ? NumZeroFormat(data?.income)
+                    : ""
+                }`,
+                alignment: "right",
+                fontSize: 11,
+              },
+              {
+                border: [true, false, true, false],
+                text: `${
+                  checkIncomeType2.includes(data?.incometype)
+                    ? NumZeroFormat(data?.wht)
+                    : ""
+                }`,
+                alignment: "right",
+                fontSize: 11,
+              },
             ],
             [
               {
@@ -795,48 +796,36 @@ export default function GeneratePdf(
                 fontSize: 11,
                 margin: [30, 0, 0, 0],
               },
-              data.incometype === "รางวัล" ||
-              data.incometype === "ส่งเสริมการขาย"
-                ? {
-                    border: [true, false, false, false],
-                    text: `\n\n\n${data?.datepaid}`,
-                    alignment: "center",
-                    fontSize: 11,
-                  }
-                : {
-                    border: [true, false, false, false],
-                    text: "",
-                    alignment: "center",
-                    fontSize: 11,
-                  },
-              data.incometype === "รางวัล" ||
-              data.incometype === "ส่งเสริมการขาย"
-                ? {
-                    border: [true, false, false, false],
-                    text: `\n\n\n${NumZeroFormat(data?.income)}`,
-                    alignment: "right",
-                    fontSize: 11,
-                  }
-                : {
-                    border: [true, false, false, false],
-                    text: "",
-                    alignment: "right",
-                    fontSize: 11,
-                  },
-              data.incometype === "รางวัล" ||
-              data.incometype === "ส่งเสริมการขาย"
-                ? {
-                    border: [true, false, true, false],
-                    text: `\n\n\n${NumZeroFormat(data?.wht)}`,
-                    alignment: "right",
-                    fontSize: 11,
-                  }
-                : {
-                    border: [true, false, true, false],
-                    text: "",
-                    alignment: "right",
-                    fontSize: 11,
-                  },
+              {
+                border: [true, false, false, false],
+                text: `${
+                  checkIncomeType5.includes(data?.incometype)
+                    ? `\n\n\n${data?.datepaid}`
+                    : ""
+                }`,
+                alignment: "center",
+                fontSize: 11,
+              },
+              {
+                border: [true, false, false, false],
+                text: `${
+                  checkIncomeType5.includes(data?.incometype)
+                    ? `\n\n\n${NumZeroFormat(data?.income)}`
+                    : ""
+                }`,
+                alignment: "right",
+                fontSize: 11,
+              },
+              {
+                border: [true, false, true, false],
+                text: `${
+                  checkIncomeType5.includes(data?.incometype)
+                    ? `\n\n\n${NumZeroFormat(data?.wht)}`
+                    : ""
+                }`,
+                alignment: "right",
+                fontSize: 11,
+              },
             ],
             [
               {
@@ -978,7 +967,7 @@ export default function GeneratePdf(
       },
       {
         text: `${
-          checkIncomeType.includes(data?.incometype) ? data?.incometype : ""
+          checkIncomeType5.includes(data?.incometype) ? data?.incometype : ""
         }`,
         fontSize: 11,
         absolutePosition: { x: 140, y: 555 },

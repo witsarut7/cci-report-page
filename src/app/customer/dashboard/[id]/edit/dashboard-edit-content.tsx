@@ -203,7 +203,22 @@ export default function DashboardEdit({ params }: { params: { id: string } }) {
 
   let selectPayoutTaxOptions: object[] = [];
   payoutTaxOption?.filter((item) => {
-    selectPayoutTaxOptions.push({ label: item.payouttax, value: item.id });
+    if (item.payouttax === 1) {
+      selectPayoutTaxOptions.push({
+        label: "หักภาษี ณ ที่จ่าย",
+        value: item.payouttax,
+      });
+    } else if (item.payouttax === 2) {
+      selectPayoutTaxOptions.push({
+        label: "ออกภาษีให้ตลอดไป",
+        value: item.payouttax,
+      });
+    } else if (item.payouttax === 3) {
+      selectPayoutTaxOptions.push({
+        label: "ออกภาษีให้ครั้งเดียว",
+        value: item.payouttax,
+      });
+    }
   });
 
   return (
@@ -393,10 +408,15 @@ export default function DashboardEdit({ params }: { params: { id: string } }) {
                   ประเภทผู้จ่าย <span className="text-red-500">*</span>
                 </p>
                 <Select
-                  value={{ label: payoutTax }}
+                  value={{
+                    label:
+                      (payoutTax === 1 && "หักภาษี ณ ที่จ่าย") ||
+                      (payoutTax === 2 && "ออกภาษีให้ตลอดไป") ||
+                      (payoutTax === 3 && "ออกภาษีให้ครั้งเดียว"),
+                  }}
                   onChange={(value: any) => {
-                    setValue("payouttax", value.label);
-                    setPayoutTax(value.label);
+                    setValue("payouttax", value.value);
+                    setPayoutTax(value.value);
                   }}
                   options={selectPayoutTaxOptions}
                   placeholder="กรุณาเลือก ประเภทผู้จ่าย"
