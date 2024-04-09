@@ -10,7 +10,11 @@ import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { selectStyles } from "@/styles/select-style";
 import Select from "react-select";
-import { pnd_income_type, pnd_percentage } from "@prisma/client";
+import {
+  pnd_income_type,
+  pnd_payout_tax,
+  pnd_percentage,
+} from "@prisma/client";
 
 export default function DashboardCreate() {
   const router = useRouter();
@@ -18,8 +22,9 @@ export default function DashboardCreate() {
     startDate: null,
     endDate: null,
   });
-  const [incometypeOption, setIncometypeOption] = useState<pnd_income_type[]>();
+  const [incomeTypeOption, setIncomeTypeOption] = useState<pnd_income_type[]>();
   const [percentageOption, setPercentageOption] = useState<pnd_percentage[]>();
+  const [payoutTaxOption, setPayoutTaxOption] = useState<pnd_payout_tax[]>();
 
   const schema = Yup.object().shape({
     docno: Yup.string().required("กรุณากรอก ภงด."),
@@ -29,8 +34,8 @@ export default function DashboardCreate() {
       .matches(/^\d{1,13}$/, "เลขบัตรประชาชนต้องไม่เกิน 13 หลักเท่านั้น")
       .required(),
     datepaid: Yup.string().required("กรุณากรอก วันที่จ่าย"),
-    incometype: Yup.string().required("กรุณากรอก ประเภทรายได้"),
-    percentage: Yup.number().typeError("กรุณากรอก อัตราร้อยละ").required(),
+    incometype: Yup.string().required("กรุณาเลือก ประเภทรายได้"),
+    percentage: Yup.number().typeError("กรุณาเลือก อัตราร้อยละ").required(),
     income: Yup.string()
       .required("กรุณากรอก จำนวนเงินได้")
       .test(
@@ -50,6 +55,7 @@ export default function DashboardCreate() {
         }
       ),
     mcode: Yup.string().required("กรุณากรอก รหัสนักธุรกิจ"),
+    payouttax: Yup.number().typeError("กรุณาเลือก ประเภทผู้จ่าย").required(),
   });
 
   type FormData = Yup.InferType<typeof schema>;
@@ -69,7 +75,7 @@ export default function DashboardCreate() {
       .then((response) => {
         const pndIncomeTypeData = response.data
           .pnd_income_type as pnd_income_type[];
-        setIncometypeOption(pndIncomeTypeData);
+        setIncomeTypeOption(pndIncomeTypeData);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -83,6 +89,19 @@ export default function DashboardCreate() {
         const pndPercentageData = response.data
           .pnd_percentage as pnd_percentage[];
         setPercentageOption(pndPercentageData);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/payout-tax`
+      )
+      .then((response) => {
+        const pndPayoutTaxData = response.data
+          .pnd_payout_tax as pnd_payout_tax[];
+        setPayoutTaxOption(pndPayoutTaxData);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -108,10 +127,11 @@ export default function DashboardCreate() {
         idcardno: data.idcardno,
         datepaid: moment(datepaid.startDate, "YYYY-MM-DD").format("DD/MM/YYYY"),
         incometype: data.incometype,
-        percentage: Number(data.percentage),
+        percentage: data.percentage,
         income: income,
         wht: wht,
         mcode: data.mcode,
+        payouttax: data.payouttax,
       }
     );
 
@@ -120,14 +140,19 @@ export default function DashboardCreate() {
     }
   };
 
-  let selectIncometypeOptions: object[] = [];
-  incometypeOption?.filter((item) => {
-    selectIncometypeOptions.push({ label: item.incometype, value: item.id });
+  let selectIncomeTypeOptions: object[] = [];
+  incomeTypeOption?.filter((item) => {
+    selectIncomeTypeOptions.push({ label: item.incometype, value: item.id });
   });
 
   let selectPercentageOptions: object[] = [];
   percentageOption?.filter((item) => {
     selectPercentageOptions.push({ label: item.percentage, value: item.id });
+  });
+
+  let selectPayoutTaxOptions: object[] = [];
+  payoutTaxOption?.filter((item) => {
+    selectPayoutTaxOptions.push({ label: item.payouttax, value: item.id });
   });
 
   return (
@@ -236,7 +261,7 @@ export default function DashboardCreate() {
                   onChange={(value: any) => {
                     setValue("incometype", value.label);
                   }}
-                  options={selectIncometypeOptions}
+                  options={selectIncomeTypeOptions}
                   placeholder="กรุณาเลือก ประเภทรายได้"
                   styles={selectStyles}
                   theme={(theme) => ({
@@ -332,6 +357,28 @@ export default function DashboardCreate() {
                       : "w-full xl:w-11/12 md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
                   }
                   {...register("mcode")}
+                />
+              </div>
+              <div>
+                <p className="xl:text-base mb-2">
+                  ประเภทผู้จ่าย <span className="text-red-500">*</span>
+                </p>
+                <Select
+                  onChange={(value: any) => {
+                    setValue("payouttax", value.label);
+                  }}
+                  options={selectPayoutTaxOptions}
+                  placeholder="กรุณาเลือก ประเภทผู้จ่าย"
+                  styles={selectStyles}
+                  theme={(theme) => ({
+                    ...theme,
+                    borderColor: "#dc2626",
+                    colors: {
+                      ...theme.colors,
+                      primary: "#2563eb",
+                    },
+                  })}
+                  className="w-full xl:w-11/12 md:h-[40px] text-sm text-gray-700"
                 />
               </div>
               <div className="grid grid-cols-1 xl:grid-cols-1 gap-5">

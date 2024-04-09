@@ -6490,6 +6490,7 @@ model pnd {
   percentage  Int
   income      Decimal  @db.Decimal(15, 2)
   wht         Decimal  @db.Decimal(15, 2)
+  payouttax   Int
   date_added  DateTime @default(now()) @db.DateTime(0)
   date_modify DateTime @default(now()) @db.Timestamp(0)
   mcode       String   @db.VarChar(255)
@@ -6520,6 +6521,13 @@ model pnd_percentage {
   date_added  DateTime @default(now()) @db.DateTime(0)
   date_modify DateTime @default(now()) @db.Timestamp(0)
   percentage  Int
+}
+
+model pnd_payout_tax {
+  id          Int      @id @default(autoincrement())
+  date_added  DateTime @default(now()) @db.DateTime(0)
+  date_modify DateTime @default(now()) @db.Timestamp(0)
+  payouttax   Int
 }
 
 enum ali_news_status {

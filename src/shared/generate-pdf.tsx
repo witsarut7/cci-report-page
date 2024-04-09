@@ -1,10 +1,10 @@
 "use client";
 
-import { ThaiBaht } from "thai-baht-text-ts";
 import { pnd } from "@prisma/client";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { TDocumentDefinitions } from "pdfmake/interfaces";
+import { bahttext } from "bahttext";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 pdfMake.fonts = {
@@ -34,6 +34,7 @@ export default function GeneratePdf(
   mType: number,
   generateType: string
 ) {
+  const checkIncomeType = ["ส่งเสริมการขาย", "รางวัล"];
   const docDefinition: TDocumentDefinitions = {
     info: {
       title: `${data.docno}-${data.name}.pdf`,
@@ -471,27 +472,7 @@ export default function GeneratePdf(
             [
               {
                 border: [true, false, false, false],
-                text: [
-                  "2. ค่าธรรมเนียม ",
-                  data.incometype === "ค่านายหน้า"
-                    ? {
-                        text: "ค่านายหน้า",
-                        fontSize: 11,
-                        bold: true,
-                        decoration: "underline",
-                        decorationStyle: "solid",
-                        decorationColor: "black",
-                      }
-                    : {
-                        text: "ค่านายหน้า",
-                        fontSize: 11,
-                      },
-                  ,
-                  {
-                    text: " ที่ปรึกษา ฯลฯ ตามมาตรา 40 (2)",
-                    fontSize: 11,
-                  },
-                ],
+                text: "2. ค่าธรรมเนียม ค่านายหน้า ที่ปรึกษา ฯลฯ ตามมาตรา 40 (2)",
                 alignment: "left",
                 fontSize: 11,
                 margin: [30, 0, 0, 0],
@@ -809,43 +790,7 @@ export default function GeneratePdf(
             [
               {
                 border: [true, false, false, false],
-                text: [
-                  "5. การจ่ายเงินได้ที่ต้องหักภาษี ณ ที่จ่ายตามคำสั่งกรมสรรพากร ที่ออกตามมาตรา 3 เตรส เช่น ",
-                  data.incometype === "รางวัล"
-                    ? {
-                        text: "รางวัล",
-                        fontSize: 11,
-                        bold: true,
-                        decoration: "underline",
-                        decorationStyle: "solid",
-                        decorationColor: "black",
-                      }
-                    : {
-                        text: "รางวัล",
-                        fontSize: 11,
-                      },
-                  {
-                    text: " ส่วนลดหรือประโยชน์ใด ๆ เนื่องจาก ",
-                    fontSize: 11,
-                  },
-                  data.incometype === "ส่งเสริมการขาย"
-                    ? {
-                        text: "การส่งเสริมการขาย",
-                        fontSize: 11,
-                        bold: true,
-                        decoration: "underline",
-                        decorationStyle: "solid",
-                        decorationColor: "black",
-                      }
-                    : {
-                        text: "การส่งเสริมการขาย",
-                        fontSize: 11,
-                      },
-                  {
-                    text: "รางวัลในการประกวด การแข่งขัน การชิงโชค ค่าแสดงของนักแสดงสาธารณะ ค่าจ้างทำของ ค่าโฆษณา ค่าเช่า ค่าขนส่ง ค่าบริการ ค่าเบี้ยประกันวินาศภัย ฯลฯ",
-                    fontSize: 11,
-                  },
-                ],
+                text: "5. การจ่ายเงินได้ที่ต้องหักภาษี ณ ที่จ่ายตามคำสั่งกรมสรรพากร ที่ออกตามมาตรา 3 เตรส เช่น รางวัล ส่วนลดหรือประโยชน์ใด ๆ เนื่องจากการส่งเสริมการขาย รางวัลในการประกวด การแข่งขัน การชิงโชค ค่าแสดงของนักแสดงสาธารณะ ค่าจ้างทำของ ค่าโฆษณา ค่าเช่า ค่าขนส่ง ค่าบริการ ค่าเบี้ยประกันวินาศภัย ฯลฯ",
                 alignment: "left",
                 fontSize: 11,
                 margin: [30, 0, 0, 0],
@@ -1032,6 +977,13 @@ export default function GeneratePdf(
         ],
       },
       {
+        text: `${
+          checkIncomeType.includes(data?.incometype) ? data?.incometype : ""
+        }`,
+        fontSize: 11,
+        absolutePosition: { x: 140, y: 555 },
+      },
+      {
         table: {
           widths: ["*"],
           body: [
@@ -1061,7 +1013,7 @@ export default function GeneratePdf(
               },
               {
                 border: [true, true, true, true],
-                text: `${ThaiBaht(Number(data?.wht))}`,
+                text: `${bahttext(Number(data?.wht))}`,
                 alignment: "center",
                 fontSize: 15,
                 bold: true,
@@ -1200,19 +1152,19 @@ export default function GeneratePdf(
       },
       // checkbox
       {
-        image: "checked",
+        image: `${data?.payouttax === 1 ? "checked" : "unchecked"}`,
         height: 7,
         width: 7,
         absolutePosition: { x: 55, y: 741.5 },
       },
       {
-        image: "unchecked",
+        image: `${data?.payouttax === 2 ? "checked" : "unchecked"}`,
         height: 7,
         width: 7,
         absolutePosition: { x: 55, y: 759.8 },
       },
       {
-        image: "unchecked",
+        image: `${data?.payouttax === 3 ? "checked" : "unchecked"}`,
         height: 7,
         width: 7,
         absolutePosition: { x: 55, y: 778.1 },
