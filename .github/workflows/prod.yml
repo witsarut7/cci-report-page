@@ -1,0 +1,43 @@
+name: Bot CI-CD CCI PND Production Deploy
+
+on:
+  push:
+    branches: [prod]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Getting start notify
+        uses: snow-actions/line-notify@v1.0.0
+        with:
+          access_token: ${{ secrets.LINE_ACCESS_TOKEN }}
+          message: |
+            CCI PND Branch : [Prod]
+            Getting start to deploy new version.
+            ## Please wait till the job is completed ##.
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          command_timeout: 20m
+          # VPS IP
+          host: ${{ secrets.VPS_SSH_HOST_PROD }}
+          username: ${{ secrets.VPS_SSH_USERNAME_PROD }}
+          password: ${{ secrets.VPS_SSH_PASSWORD_PROD }}
+          port: ${{ secrets.VPS_SSH_PORT_PROD }}
+
+          script: |
+            cd ${{ secrets.PROJECT_PATH_PROD }}
+            git pull origin prod
+            docker-compose -p prod-cmspndreport -f prod-docker-compose.yml up --build -d --force-recreate
+            echo "Successfully..."
+            # docker image prune -a -f
+
+      - name: Final call notify
+        uses: snow-actions/line-notify@v1.0.0
+        with:
+          access_token: ${{ secrets.LINE_ACCESS_TOKEN }}
+          message: |
+            CCI PND Branch : [Prod]
+            Deploy Successfully...
