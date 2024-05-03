@@ -69,9 +69,7 @@ export default function DashboardCreate() {
 
   useEffect(() => {
     axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/income-type`
-      )
+      .get(`${process.env.NEXT_PUBLIC_SERVICE_URL}/customer/api/income-type`)
       .then((response) => {
         const pndIncomeTypeData = response.data
           .pnd_income_type as pnd_income_type[];
@@ -82,9 +80,7 @@ export default function DashboardCreate() {
       });
 
     axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/percentage`
-      )
+      .get(`${process.env.NEXT_PUBLIC_SERVICE_URL}/customer/api/percentage`)
       .then((response) => {
         const pndPercentageData = response.data
           .pnd_percentage as pnd_percentage[];
@@ -95,9 +91,7 @@ export default function DashboardCreate() {
       });
 
     axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/payout-tax`
-      )
+      .get(`${process.env.NEXT_PUBLIC_SERVICE_URL}/customer/api/payout-tax`)
       .then((response) => {
         const pndPayoutTaxData = response.data
           .pnd_payout_tax as pnd_payout_tax[];
@@ -119,7 +113,7 @@ export default function DashboardCreate() {
     const wht = await decimalNumber(data.wht);
 
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/dashboard`,
+      `${process.env.NEXT_PUBLIC_SERVICE_URL}/customer/api/dashboard`,
       {
         docno: data.docno,
         name: data.name,

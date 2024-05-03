@@ -25,12 +25,9 @@ export default function DashboardData(userData: {
 
   useEffect(() => {
     axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/member/api/dashboard`,
-        {
-          params: { page: page, limit: limit, mcode: mcode },
-        }
-      )
+      .get(`${process.env.NEXT_PUBLIC_SERVICE_URL}/member/api/dashboard`, {
+        params: { page: page, limit: limit, mcode: mcode },
+      })
       .then((response) => {
         setData(response.data.pnd);
         setPageCount(response.data.pageCount);
@@ -62,7 +59,7 @@ export default function DashboardData(userData: {
   const handleMultiExportPdf = async () => {
     const response = await axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/member/api/dashboard/export-pdf`,
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}/member/api/dashboard/export-pdf`,
         {
           params: { ids: selectedItems.join(",") },
         }

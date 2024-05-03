@@ -40,18 +40,15 @@ export default function DashboardData() {
 
   useEffect(() => {
     axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/dashboard`,
-        {
-          params: {
-            page: page,
-            limit: limit,
-            startDate: dateRange?.startDate,
-            endDate: dateRange?.endDate,
-            search: search,
-          },
-        }
-      )
+      .get(`${process.env.NEXT_PUBLIC_SERVICE_URL}/customer/api/dashboard`, {
+        params: {
+          page: page,
+          limit: limit,
+          startDate: dateRange?.startDate,
+          endDate: dateRange?.endDate,
+          search: search,
+        },
+      })
       .then((response) => {
         setData(response.data.pnd);
         setPageCount(response.data.pageCount);
@@ -78,18 +75,15 @@ export default function DashboardData() {
 
   const fetchData = async () => {
     axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/dashboard`,
-        {
-          params: {
-            page: page,
-            limit: limit,
-            startDate: dateRange?.startDate,
-            endDate: dateRange?.endDate,
-            search: search,
-          },
-        }
-      )
+      .get(`${process.env.NEXT_PUBLIC_SERVICE_URL}/customer/api/dashboard`, {
+        params: {
+          page: page,
+          limit: limit,
+          startDate: dateRange?.startDate,
+          endDate: dateRange?.endDate,
+          search: search,
+        },
+      })
       .then((res) => {
         setData(res.data.pnd);
         setPageCount(res.data.pageCount);
@@ -129,7 +123,7 @@ export default function DashboardData() {
 
   const handleMultiDelete = async () => {
     const response = await axios.delete(
-      `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/dashboard`,
+      `${process.env.NEXT_PUBLIC_SERVICE_URL}/customer/api/dashboard`,
       {
         data: selectedItems,
       }
@@ -155,7 +149,7 @@ export default function DashboardData() {
 
   const handleMultiCreate = async () => {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/dashboard/import-excel`,
+      `${process.env.NEXT_PUBLIC_SERVICE_URL}/customer/api/dashboard/import-excel`,
       { jsonResult }
     );
 
@@ -250,12 +244,9 @@ export default function DashboardData() {
 
   const handleExportPdf = async (data: pnd, mcode: string) => {
     const response = await axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/member`,
-        {
-          params: { mcode: mcode },
-        }
-      )
+      .get(`${process.env.NEXT_PUBLIC_SERVICE_URL}/customer/api/member`, {
+        params: { mcode: mcode },
+      })
       .then((res) => {
         return res.data.member as ali_member;
       })
@@ -283,7 +274,7 @@ export default function DashboardData() {
   const handleMultiExportPdf = async () => {
     const response = await axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/member/api/dashboard/export-pdf`,
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}/member/api/dashboard/export-pdf`,
         {
           params: { ids: selectedItems.join(",") },
         }
@@ -298,12 +289,9 @@ export default function DashboardData() {
     if (response) {
       for (const item of response) {
         const findMember = await axios
-          .get(
-            `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/member`,
-            {
-              params: { mcode: item.mcode },
-            }
-          )
+          .get(`${process.env.NEXT_PUBLIC_SERVICE_URL}/customer/api/member`, {
+            params: { mcode: item.mcode },
+          })
           .then((res) => {
             return res.data.member as ali_member;
           })
