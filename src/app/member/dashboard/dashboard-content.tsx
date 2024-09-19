@@ -9,6 +9,7 @@ import { MdLogout } from "react-icons/md";
 import Image from "next/image";
 import { logout } from "./action";
 import ConfirmModal from "@/shared/confirm-modal";
+import Select from "react-tailwindcss-select";
 
 export default function DashboardData(userData: {
   mType: number;
@@ -22,6 +23,8 @@ export default function DashboardData(userData: {
   const [mcode, setMcode] = useState(userData.mcode);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
+  const [year, setYear] = useState(null);
+  const [actionPdf, setActionPdf] = useState(false);
 
   useEffect(() => {
     axios
@@ -83,6 +86,28 @@ export default function DashboardData(userData: {
     setSelectedItems([]);
   };
 
+  const handleExportPdfYear = async () => {
+    const response = await axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/member/api/dashboard/export-pdf-year`,
+        {
+          params: { mcode: mcode, year: year },
+        }
+      )
+      .then((res) => {
+        return res.data.pnd as pnd[];
+      })
+      .catch((error) => {
+        throw error;
+      });
+
+    if (response.length > 0) {
+      for (const item of response) {
+        GeneratePdf(item, userData.mType, "Download");
+      }
+    }
+  };
+
   const handleCheckboxChange = (id: number) => {
     const selectedIndex = selectedItems.indexOf(id);
     if (selectedIndex === -1) {
@@ -103,6 +128,22 @@ export default function DashboardData(userData: {
     }
   };
 
+  let options = [{ value: "", label: "" }];
+  let uniqueYears = new Set();
+
+  data?.forEach((item) => {
+    const year = item.docno.split("/")[0];
+
+    if (year && year.trim() && !uniqueYears.has(year)) {
+      uniqueYears.add(year);
+      options.push({ value: year, label: year });
+    }
+  });
+
+  const handleChange = (value: any) => {
+    setYear(value);
+  };
+
   return (
     <div className="p-14 mx-2">
       {/* header */}
@@ -114,20 +155,48 @@ export default function DashboardData(userData: {
         </div>
       </div>
 
-      <div className="flex gap-5 mb-4">
-        <div className="flex h-[40px] justify-center items-center">
-          <p className="md:text-base">
-            เลือกแล้ว {selectedItems.length} รายการ
-          </p>
+      <div className="flex gap-5 justify-between">
+        <div className="flex gap-5 mb-4">
+          <div className="flex h-[40px] justify-center items-center">
+            <p className="md:text-base">
+              เลือกแล้ว {selectedItems.length} รายการ
+            </p>
+          </div>
+          <button
+            onClick={() => setOpenConfirmModal(true)}
+            className={`md:text-base md:w-[114px] md:h-[40px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+              selectedItems.length === 0 && "invisible"
+            }`}
+          >
+            Export PDF
+          </button>
         </div>
-        <button
-          onClick={() => setOpenConfirmModal(true)}
-          className={`md:text-base md:w-[114px] md:h-[40px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
-            selectedItems.length === 0 && "invisible"
-          }`}
-        >
-          Export PDF
-        </button>
+
+        {actionPdf ? (
+          <div className="flex gap-5">
+            <Select
+              value={year}
+              onChange={handleChange}
+              options={options}
+              primaryColor={""}
+              isClearable={true}
+              placeholder="เลือกปี"
+            />
+            <button
+              onClick={() => handleExportPdfYear()}
+              className="flex items-center md:text-base md:w-[184px] md:h-[37px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+            >
+              Export PDF
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setActionPdf(true)}
+            className="flex items-center md:text-base md:w-[164px] md:h-[37px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+          >
+            Export PDF รายปี
+          </button>
+        )}
       </div>
 
       {/* table */}
