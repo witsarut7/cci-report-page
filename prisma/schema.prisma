@@ -55,9 +55,9 @@ model ali_ac {
   btype        String?  @db.VarChar(10)
   pv           Decimal  @db.Decimal(15, 2)
   percer       Decimal  @db.Decimal(15, 2)
-  rebatePv     Decimal? @db.Decimal(15, 2)
-  rebate       Decimal? @db.Decimal(15, 2)
   total        Decimal  @db.Decimal(15, 2)
+  rebatePv     Decimal  @default(0.00) @db.Decimal(15, 2)
+  rebate       Decimal  @default(0.00) @db.Decimal(15, 2)
   fdate        DateTime @db.Date
   tdate        DateTime @db.Date
   pos_cur      String   @db.VarChar(255)
@@ -1056,7 +1056,7 @@ model ali_commission {
   id                  Int      @id @default(autoincrement())
   mcode               String   @db.VarChar(255)
   name_t              String   @db.VarChar(255)
-  rebate              Decimal? @default(0.00) @db.Decimal(15, 2)
+  rebate              Decimal  @default(0.00) @db.Decimal(15, 2)
   ambonus             Decimal  @db.Decimal(15, 2)
   bmbonus             Decimal  @db.Decimal(15, 2)
   dmbonus             Decimal  @db.Decimal(15, 2)
@@ -6497,11 +6497,12 @@ model pnd {
 }
 
 model ali_structure_sponsor_tmp {
-  id          Int    @id @default(autoincrement()) @db.UnsignedInt
-  mcode_index String @db.VarChar(1000)
-  mcode_ref   String @db.VarChar(255)
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
+  mcode_index String   @db.VarChar(1000)
+  mcode_ref   String   @db.VarChar(255)
   tot_pv      Int
   level       Int
+  date_modify DateTime @default(now()) @db.Timestamp(0)
 
   @@index([level], map: "level")
   @@index([mcode_index(length: 767)], map: "mcode_index")
