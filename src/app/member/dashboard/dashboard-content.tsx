@@ -9,7 +9,8 @@ import { MdLogout } from "react-icons/md";
 import Image from "next/image";
 import { logout } from "./action";
 import ConfirmModal from "@/shared/confirm-modal";
-import Select from "react-tailwindcss-select";
+import { selectStyles } from "@/styles/select-style";
+import Select from "react-select";
 
 export default function DashboardData(userData: {
   mType: number;
@@ -125,7 +126,7 @@ export default function DashboardData(userData: {
     }
   };
 
-  let options = [{ value: "", label: "" }];
+  let options: object[] = [];
   let uniqueYears = new Set();
 
   data?.forEach((item) => {
@@ -172,12 +173,20 @@ export default function DashboardData(userData: {
         {actionPdf ? (
           <div className="flex gap-5">
             <Select
-              value={year}
               onChange={handleChange}
               options={options}
-              primaryColor={""}
               isClearable={true}
-              placeholder="เลือกปี"
+              placeholder="กรุณาเลือกปี"
+              styles={selectStyles}
+              theme={(theme) => ({
+                ...theme,
+                borderColor: "#dc2626",
+                colors: {
+                  ...theme.colors,
+                  primary: "#2563eb",
+                },
+              })}
+              className="w-full xl:w-11/12 md:h-[40px] text-sm text-gray-700"
             />
             <button
               onClick={() => handleExportPdfYear()}
