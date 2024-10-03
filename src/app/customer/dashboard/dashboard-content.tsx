@@ -15,6 +15,8 @@ import { Flip, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GeneratePdf from "@/shared/generate-pdf";
 import ConfirmModal from "@/shared/confirm-modal";
+import { selectStyles } from "@/styles/select-style";
+import Select from "react-select";
 
 export default function DashboardData() {
   const router = useRouter();
@@ -33,6 +35,9 @@ export default function DashboardData() {
   const [jsonResult, setJsonResult] = useState<Array<JsonObject>>([]);
   const [deleteConfirmModal, setDeleteConfirmModal] = useState(false);
   const [exportPdfConfirmModal, setExportPdfConfirmModal] = useState(false);
+  const [mcode, setMcode] = useState("");
+  const [year, setYear] = useState(null);
+  const [actionPdf, setActionPdf] = useState(false);
 
   interface JsonObject {
     [key: string]: string;
@@ -332,6 +337,84 @@ export default function DashboardData() {
     setSelectedItems([]);
   };
 
+  const handleExportPdfYear = async () => {
+    const findMember = await axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/member`,
+        {
+          params: { mcode: mcode },
+        }
+      )
+      .then((res) => {
+        return res.data.member as ali_member;
+      })
+      .catch((error) => {
+        throw error;
+      });
+
+    if (!findMember) {
+      return toast.error(`รหัสนักธุรกิจ ${mcode} ไม่ถูกต้อง`, {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Flip,
+      });
+    }
+
+    const response = await axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/dashboard/export-pdf-year`,
+        {
+          params: { mcode: mcode, year: year },
+        }
+      )
+      .then((res) => {
+        return res.data;
+      })
+      .catch((error) => {
+        throw error;
+      });
+
+    if (response?.pnd1?.length > 0) {
+      for (const item of response.pnd1) {
+        GeneratePdf(item, response.pnd1.mType, "Download");
+      }
+    }
+
+    if (response?.pnd2?.length > 0) {
+      for (const item of response.pnd2) {
+        GeneratePdf(item, response.pnd2.mType, "Download");
+      }
+    }
+
+    if (response?.pnd3?.length > 0) {
+      for (const item of response.pnd3) {
+        GeneratePdf(item, response.pnd3.mType, "Download");
+      }
+    }
+  };
+
+  let options: object[] = [];
+  let uniqueYears = new Set();
+
+  data?.forEach((item) => {
+    const year = item.docno.split("/")[0];
+
+    if (year && year.trim() && !uniqueYears.has(year)) {
+      uniqueYears.add(year);
+      options.push({ value: year, label: year });
+    }
+  });
+
+  const handleChange = (value: any) => {
+    setYear(value);
+  };
+
   return (
     <div className="p-14 mx-2">
       <ToastContainer stacked />
@@ -371,70 +454,61 @@ export default function DashboardData() {
         </div>
 
         <div className="flex gap-5">
-          <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <AiOutlineSearch className="md:w-6 md:h-6" />
-            </div>
-            <input
-              type="search"
-              className="md:w-[288px] md:h-[40px] block p-4 ps-10 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-              placeholder="ค้นหา"
-              onChange={(value) => {
-                setSearch(value.target.value);
-              }}
-            />
-          </div>
-
-          <div className="relative">
-            <Datepicker
-              inputClassName="md:w-[288px] md:h-[40px] block p-4 ps-10 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-              toggleClassName="absolute text-[#000000] ps-3 inset-y-0 start-0 focus:outline-none"
-              i18n={"th"}
-              placeholder={"เลือกวันที่"}
-              primaryColor={"blue"}
-              value={dateRange}
-              onChange={(value: any) => {
-                setDateRange(value);
-              }}
-              displayFormat={"DD/MM/YYYY"}
-              startWeekOn="mon"
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              router.push("/customer/dashboard/create");
-            }}
-            className="md:text-base md:w-[125px] md:h-[40px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-          >
-            เพิ่มข้อมูล
-          </button>
-
-          <div className="block">
-            {jsonResult.length === 0 ? (
-              <div>
-                <label
-                  htmlFor="file-upload"
-                  className="md:text-base md:w-[125px] md:h-[40px] cursor-pointer inline-flex items-center justify-center px-4 py-2 border border-transparent text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-                >
-                  Import Excel
-                </label>
-                <input
-                  id="file-upload"
-                  type="file"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
+          {!actionPdf && (
+            <div className="relative">
+              <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                <AiOutlineSearch className="md:w-6 md:h-6" />
               </div>
-            ) : (
-              <div className="flex gap-5">
+              <input
+                type="search"
+                className="md:w-[288px] md:h-[40px] block p-4 ps-10 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                placeholder="ค้นหา"
+                onChange={(value) => {
+                  setSearch(value.target.value);
+                }}
+              />
+            </div>
+          )}
+
+          {!actionPdf && (
+            <div className="relative">
+              <Datepicker
+                inputClassName="md:w-[288px] md:h-[40px] block p-4 ps-10 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                toggleClassName="absolute text-[#000000] ps-3 inset-y-0 start-0 focus:outline-none"
+                i18n={"th"}
+                placeholder={"เลือกวันที่"}
+                primaryColor={"blue"}
+                value={dateRange}
+                onChange={(value: any) => {
+                  setDateRange(value);
+                }}
+                displayFormat={"DD/MM/YYYY"}
+                startWeekOn="mon"
+              />
+            </div>
+          )}
+
+          {!actionPdf && (
+            <button
+              type="button"
+              onClick={() => {
+                router.push("/customer/dashboard/create");
+              }}
+              className="md:text-base md:w-[125px] md:h-[40px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+            >
+              เพิ่มข้อมูล
+            </button>
+          )}
+
+          {!actionPdf && (
+            <div className="block">
+              {jsonResult.length === 0 ? (
                 <div>
                   <label
                     htmlFor="file-upload"
-                    className="md:text-base w-full cursor-pointer border-b-black border-b-2 hover:text-blue-600 hover:border-b-blue-600"
+                    className="md:text-base md:w-[125px] md:h-[40px] cursor-pointer inline-flex items-center justify-center px-4 py-2 border border-transparent text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
                   >
-                    <span>{file.name}</span>
+                    Import Excel
                   </label>
                   <input
                     id="file-upload"
@@ -443,24 +517,94 @@ export default function DashboardData() {
                     className="hidden"
                   />
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setJsonResult([]);
-                  }}
-                  className="md:text-base md:w-[69px] md:h-[40px] p-2 tracking-wide text-black transition-colors duration-200 transform bg-gray-400 rounded-md hover:bg-[#C0C0C0] focus:outline-nonefocus:bg-[#C0C0C0] border"
-                >
-                  ยกเลิก
-                </button>
-                <button
-                  className="md:text-base md:w-[69px] md:h-[40px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#15803d] rounded-md hover:bg-green-600 focus:outline-none focus:bg-green-600"
-                  onClick={handleMultiCreate}
-                >
-                  ตกลง
-                </button>
-              </div>
-            )}
-          </div>
+              ) : (
+                <div className="flex gap-5">
+                  <div>
+                    <label
+                      htmlFor="file-upload"
+                      className="md:text-base w-full cursor-pointer border-b-black border-b-2 hover:text-blue-600 hover:border-b-blue-600"
+                    >
+                      <span>{file.name}</span>
+                    </label>
+                    <input
+                      id="file-upload"
+                      type="file"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setJsonResult([]);
+                    }}
+                    className="md:text-base md:w-[69px] md:h-[40px] p-2 tracking-wide text-black transition-colors duration-200 transform bg-gray-400 rounded-md hover:bg-[#C0C0C0] focus:outline-nonefocus:bg-[#C0C0C0] border"
+                  >
+                    ยกเลิก
+                  </button>
+                  <button
+                    className="md:text-base md:w-[69px] md:h-[40px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#15803d] rounded-md hover:bg-green-600 focus:outline-none focus:bg-green-600"
+                    onClick={handleMultiCreate}
+                  >
+                    ตกลง
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {actionPdf ? (
+            <div className="flex gap-5">
+              <Select
+                onChange={handleChange}
+                options={options}
+                isClearable={true}
+                placeholder="กรุณาเลือกปี"
+                styles={selectStyles}
+                theme={(theme) => ({
+                  ...theme,
+                  borderColor: "#dc2626",
+                  colors: {
+                    ...theme.colors,
+                    primary: "#2563eb",
+                  },
+                })}
+                className="w-full xl:w-11/12 md:h-[40px] text-sm text-gray-700"
+              />
+
+              <input
+                type="search"
+                className="md:w-[150px] md:h-[40px] block p-4 text-sm text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                placeholder="กรอกรหัสนักธุรกิจ"
+                onChange={(value) => {
+                  setMcode(value.target.value);
+                }}
+              />
+
+              <button
+                onClick={() => handleExportPdfYear()}
+                disabled={year === null || mcode === ""}
+                className="disabled:bg-blue-300 flex items-center md:text-base md:w-[230px] md:h-[37px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+              >
+                Export PDF
+              </button>
+              <button
+                onClick={() => {
+                  setActionPdf(false);
+                }}
+                className="flex items-center md:text-base md:w-[69px] md:h-[37px] p-2 tracking-wide text-black transition-colors duration-200 transform bg-[#FFFFFF] rounded-md hover:bg-[#C0C0C0] focus:outline-nonefocus:bg-[#C0C0C0] border"
+              >
+                ยกเลิก
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setActionPdf(true)}
+              className="flex items-center md:text-base md:w-[164px] md:h-[37px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+            >
+              Export PDF รายปี
+            </button>
+          )}
         </div>
       </div>
 

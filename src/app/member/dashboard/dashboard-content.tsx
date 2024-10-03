@@ -96,14 +96,26 @@ export default function DashboardData(userData: {
         }
       )
       .then((res) => {
-        return res.data.pnd as pnd[];
+        return res.data;
       })
       .catch((error) => {
         throw error;
       });
 
-    if (response.length > 0) {
-      for (const item of response) {
+    if (response?.pnd1?.length > 0) {
+      for (const item of response.pnd1) {
+        GeneratePdf(item, userData.mType, "Download");
+      }
+    }
+
+    if (response?.pnd2?.length > 0) {
+      for (const item of response.pnd2) {
+        GeneratePdf(item, userData.mType, "Download");
+      }
+    }
+
+    if (response?.pnd3?.length > 0) {
+      for (const item of response.pnd3) {
         GeneratePdf(item, userData.mType, "Download");
       }
     }
@@ -193,9 +205,18 @@ export default function DashboardData(userData: {
             />
             <button
               onClick={() => handleExportPdfYear()}
-              className="flex items-center md:text-base md:w-[184px] md:h-[37px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+              disabled={year === null}
+              className="disabled:bg-blue-300 flex items-center md:text-base md:w-[184px] md:h-[37px] px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#002DCD] rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
             >
               Export PDF
+            </button>
+            <button
+              onClick={() => {
+                setActionPdf(false);
+              }}
+              className="flex items-center md:text-base md:w-[69px] md:h-[37px] p-2 tracking-wide text-black transition-colors duration-200 transform bg-[#FFFFFF] rounded-md hover:bg-[#C0C0C0] focus:outline-nonefocus:bg-[#C0C0C0] border"
+            >
+              ยกเลิก
             </button>
           </div>
         ) : (
