@@ -182,7 +182,7 @@ export default function DashboardData(userData: {
           </button>
         </div>
 
-        {/* {actionPdf ? (
+        {actionPdf ? (
           <div className="flex gap-5">
             <Select
               onChange={handleChange}
@@ -223,7 +223,7 @@ export default function DashboardData(userData: {
           >
             Export PDF รายปี
           </button>
-        )} */}
+        )}
       </div>
 
       {/* table */}
