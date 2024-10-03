@@ -87,7 +87,7 @@ export default function DashboardData(userData: {
   const handleExportPdfYear = async () => {
     const response = await axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/member/api/dashboard/export-pdf-year`,
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}/member/api/dashboard/export-pdf-year`,
         {
           params: { mcode: mcode, year: year },
         }
@@ -182,7 +182,7 @@ export default function DashboardData(userData: {
           </button>
         </div>
 
-        {actionPdf ? (
+        {/* {actionPdf ? (
           <div className="flex gap-5">
             <Select
               onChange={handleChange}
@@ -223,7 +223,7 @@ export default function DashboardData(userData: {
           >
             Export PDF รายปี
           </button>
-        )}
+        )} */}
       </div>
 
       {/* table */}

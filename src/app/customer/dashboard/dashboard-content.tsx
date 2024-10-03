@@ -327,12 +327,9 @@ export default function DashboardData() {
 
   const handleExportPdfYear = async () => {
     const findMember = await axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/member`,
-        {
-          params: { mcode: mcode },
-        }
-      )
+      .get(`${process.env.NEXT_PUBLIC_SERVICE_URL}/customer/api/member`, {
+        params: { mcode: mcode },
+      })
       .then((res) => {
         return res.data.member as ali_member;
       })
@@ -356,7 +353,7 @@ export default function DashboardData() {
 
     const response = await axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVICE_URL}:${process.env.NEXT_PUBLIC_SERVICE_PORT}/customer/api/dashboard/export-pdf-year`,
+        `${process.env.NEXT_PUBLIC_SERVICE_URL}/customer/api/dashboard/export-pdf-year`,
         {
           params: { mcode: mcode, year: year },
         }
