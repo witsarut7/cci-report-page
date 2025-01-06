@@ -188,6 +188,20 @@ export default function DashboardData() {
     }
   };
 
+  const columnTypes: Record<string, "string" | "number" | "decimal"> = {
+    docno: "string",
+    name: "string",
+    address: "string",
+    idcardno: "string",
+    datepaid: "string",
+    incometype: "string",
+    percentage: "number",
+    income: "decimal",
+    wht: "decimal",
+    mcode: "string",
+    payouttax: "number",
+  };
+
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -236,7 +250,19 @@ export default function DashboardData() {
           const jsonArray: Array<JsonObject> = filteredData.map((row) => {
             const jsonObject: JsonObject = {};
             headers.forEach((header, index) => {
-              jsonObject[header] = row[index];
+              const type = columnTypes[header];
+              let value: any = row[index];
+
+              if (type === "number") {
+                value = parseFloat(value);
+                if (isNaN(value)) value = null;
+              } else if (type === "string") {
+                value = value ? String(value) : null;
+              } else if (type === "decimal") {
+                value = parseFloat(parseFloat(value).toFixed(2));
+                if (isNaN(value)) value = null;
+              }
+              jsonObject[header] = value;
             });
             return jsonObject;
           });
