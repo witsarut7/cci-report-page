@@ -780,7 +780,7 @@ export default function DashboardData() {
               }}
               className="flex h-[30px] border-0 py-0 focus:ring-0 md:border text-sm"
             >
-              {[10, 20, 30, 40, 50].map((pageSize) => (
+              {[10, 20, 30, 40, 50, 70, 100].map((pageSize) => (
                 <option key={pageSize} value={pageSize}>
                   {pageSize}
                 </option>
